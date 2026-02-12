@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Risk &amp; Governance — Hephaestus Quant</title>
+  <meta name="description" content="Risk management framework and organizational governance at Hephaestus Quant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="research.html">Research</a>
+        <a href="kernel.html">Kernel</a>
+        <a href="doctrine.html">Doctrine</a>
+        <a href="governance.html" class="active">Governance</a>
+        <a href="about.html">About</a>
+        <a href="apply.html">Apply</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <span class="label">Risk &amp; Governance</span>
+      <h1>Risk-first methodology.</h1>
+      <p class="subtitle">
+        Risk management is not a constraint on research — it is the foundation.
+        Every decision framework starts with an understanding of what can go wrong.
+      </p>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Philosophy</span>
+        <h2>Risk framework</h2>
+      </div>
+      <div class="text-two-col">
+        <div>
+          <p>
+            We treat risk as the primary object of analysis. Return is a consequence
+            of correctly identified and managed risk exposures — not the other way around.
+            Every strategy evaluation begins with risk decomposition.
+          </p>
+        </div>
+        <div>
+          <p>
+            Models fail. Regimes shift. Correlations break. Our framework assumes
+            these events will happen and builds in structural responses:
+            drawdown guards, exposure limits, and regime-conditional rebalancing rules.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Principles</span>
+        <h2>Risk management standards</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Capital preservation bias</h3>
+          <p>
+            Asymmetric loss function. We prefer to miss upside
+            rather than realize avoidable drawdowns. Position sizing
+            reflects worst-case, not expected-case scenarios.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Regime conditioning</h3>
+          <p>
+            Risk parameters are not static. Exposure limits, correlation assumptions,
+            and rebalancing frequency are conditioned on detected market regime.
+            A single parameter set across all environments is a model failure.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Multi-level decomposition</h3>
+          <p>
+            Portfolio risk is decomposed into factor risk, idiosyncratic risk,
+            and regime risk. Each level has independent monitoring
+            and independent response mechanisms.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Negative result documentation</h3>
+          <p>
+            Failed strategies and rejected hypotheses are documented
+            with the same rigor as successful ones. The failure archive
+            is a core research asset.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Structure</span>
+        <h2>Organizational governance</h2>
+      </div>
+      <div class="text-two-col">
+        <div>
+          <h3>Research review</h3>
+          <p>
+            All research output is subject to internal peer review before
+            it informs any investment decision. Review evaluates methodology,
+            statistical validity, and robustness — not conviction.
+          </p>
+        </div>
+        <div>
+          <h3>Decision separation</h3>
+          <p>
+            The person who generates a research signal does not make the deployment
+            decision. Research and risk management operate as independent functions
+            with separate evaluation criteria.
+          </p>
+        </div>
+      </div>
+      <div class="text-two-col" style="margin-top: var(--space-md);">
+        <div>
+          <h3>Transparency</h3>
+          <p>
+            All assumptions, parameters, and model limitations are documented
+            and accessible to every member. There are no proprietary black boxes
+            within the research process.
+          </p>
+        </div>
+        <div>
+          <h3>Individual responsibility</h3>
+          <p>
+            Members invest on their own accounts and make their own allocation decisions.
+            Hephaestus Quant provides research infrastructure and methodology —
+            not investment advice or fund management.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>Est. 2025</span>
+    </div>
+  </footer>
+
+</body>
+</html>
+

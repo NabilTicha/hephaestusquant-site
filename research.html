@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Research — Hephaestus Quant</title>
+  <meta name="description" content="Quantamental research: factor decomposition, regime detection, and risk attribution at Hephaestus Quant." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="research.html" class="active">Research</a>
+        <a href="kernel.html">Kernel</a>
+        <a href="doctrine.html">Doctrine</a>
+        <a href="governance.html">Governance</a>
+        <a href="about.html">About</a>
+        <a href="apply.html">Apply</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <span class="label">Research</span>
+      <h1>Quantamental research.</h1>
+      <p class="subtitle">
+        We operate at the intersection of quantitative and fundamental analysis — systematic factor modeling
+        conditioned on regime-aware risk management.
+      </p>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Approach</span>
+        <h2>What we do</h2>
+      </div>
+      <div class="text-two-col">
+        <p>
+          We do not predict markets. We identify structural relationships,
+          test whether they survive out-of-sample, and discard what does not replicate.
+          Every claim is treated as a hypothesis subject to falsification.
+        </p>
+        <p>
+          Research output is evaluated on reproducibility, not conviction.
+          Negative results are documented with the same rigor as positive ones.
+          There is no distinction in our process between a failed hypothesis
+          and a successful one — both produce information.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Domains</span>
+        <h2>Focus areas</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Factor research</h3>
+          <p>
+            Systematic identification, construction, and evaluation of return drivers
+            across equity, fixed income, and cross-asset universes. We study factor
+            decay, interaction effects, and the conditions under which factors fail.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Regime analysis</h3>
+          <p>
+            Markets are non-stationary. We model volatility regimes, correlation
+            structure breaks, and macro state transitions to condition factor exposure
+            and risk allocation.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Risk decomposition</h3>
+          <p>
+            Understanding where risk comes from matters more than where return comes from.
+            We decompose portfolio risk into factor, idiosyncratic,
+            and regime components.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Open questions</span>
+        <h2>Active research problems</h2>
+        <p>These are questions we are currently investigating or seeking proposals for.</p>
+      </div>
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">Factor</span>
+          <span class="item-text">Is momentum robust after transaction costs in European mid-caps?</span>
+        </li>
+        <li>
+          <span class="item-tag">Regime</span>
+          <span class="item-text">Does correlation instability cluster around volatility regime shifts?</span>
+        </li>
+        <li>
+          <span class="item-tag">Crowding</span>
+          <span class="item-text">Can factor decay be modeled as a function of crowding proxies?</span>
+        </li>
+        <li>
+          <span class="item-tag">Regime</span>
+          <span class="item-text">What is the minimum observation window for reliable regime classification?</span>
+        </li>
+        <li>
+          <span class="item-tag">Factor</span>
+          <span class="item-text">How does factor exposure drift under varying liquidity conditions?</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Standards</span>
+        <h2>Methodology</h2>
+      </div>
+      <p style="margin-bottom: var(--space-md);">All research follows a falsification-first protocol:</p>
+      <ol class="numbered-list">
+        <li>State a falsifiable hypothesis.</li>
+        <li>Define rejection criteria before running any test.</li>
+        <li>Use out-of-sample validation.</li>
+        <li>Report negative results.</li>
+        <li>Separate research claims from strategy deployment decisions.</li>
+      </ol>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>Est. 2025</span>
+    </div>
+  </footer>
+
+</body>
+</html>
+

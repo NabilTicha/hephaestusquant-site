@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kernel — Hephaestus Quant</title>
+  <meta name="description" content="Kernel: a modular Python-based quantitative research and backtesting infrastructure for systematic factor research." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="research.html">Research</a>
+        <a href="kernel.html" class="active">Kernel</a>
+        <a href="doctrine.html">Doctrine</a>
+        <a href="governance.html">Governance</a>
+        <a href="about.html">About</a>
+        <a href="apply.html">Apply</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <span class="label">Infrastructure</span>
+      <h1>Kernel</h1>
+      <p class="subtitle">
+        A modular Python-based quantitative research and backtesting infrastructure
+        built for systematic factor research, regime analysis, and reproducible
+        strategy evaluation.
+      </p>
+      <div class="meta">Python · Open source · Under active development</div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Positioning</span>
+        <h2>Why Kernel exists</h2>
+      </div>
+      <div class="text-two-col">
+        <div>
+          <p>
+            Existing platforms like QuantConnect impose assumptions about strategy structure,
+            data access, and execution that constrain research. They optimize for deployment
+            convenience, not research rigor.
+          </p>
+        </div>
+        <div>
+          <p>
+            Kernel is built for the opposite priority: research-first infrastructure
+            where every component is open, inspectable, and replaceable.
+            No black boxes. No vendor lock-in. Full control over every assumption
+            in the pipeline.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Design</span>
+        <h2>Architecture principles</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Modular</h3>
+          <p>
+            Each component — data ingestion, factor construction, backtesting,
+            risk analytics — is an independent module with a defined interface.
+            Replace any part without touching the rest.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Reproducible</h3>
+          <p>
+            Every research run produces a deterministic, versioned output.
+            Same inputs, same configuration, same result.
+            No hidden state.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Transparent</h3>
+          <p>
+            No proprietary layers between you and the computation.
+            All logic is readable source code. All assumptions are explicit
+            and documented in the pipeline configuration.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Research-first</h3>
+          <p>
+            Kernel is not a trading platform. It is a research tool.
+            It is designed to answer questions about markets, not to execute trades.
+            Strategy evaluation is a research output, not a production system.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Capabilities</span>
+        <h2>Core modules</h2>
+      </div>
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">Data</span>
+          <span class="item-text">Survivorship-bias–aware data ingestion and normalization pipeline.</span>
+        </li>
+        <li>
+          <span class="item-tag">Factors</span>
+          <span class="item-text">Factor construction framework with cross-sectional and time-series support.</span>
+        </li>
+        <li>
+          <span class="item-tag">Backtest</span>
+          <span class="item-text">Event-driven and vectorized backtesting with configurable transaction cost models.</span>
+        </li>
+        <li>
+          <span class="item-tag">Risk</span>
+          <span class="item-text">Multi-level risk decomposition: factor, idiosyncratic, and regime components.</span>
+        </li>
+        <li>
+          <span class="item-tag">Regime</span>
+          <span class="item-text">Rolling regime detection using HMM and volatility state models.</span>
+        </li>
+        <li>
+          <span class="item-tag">Diagnostics</span>
+          <span class="item-text">Factor exposure analysis, decay diagnostics, and out-of-sample validation tooling.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <span class="label">Status</span>
+        <h2>Development</h2>
+      </div>
+      <p>
+        Kernel is under active internal development. Source will be released
+        as open-source infrastructure when core modules reach stability.
+      </p>
+      <p style="margin-top: var(--space-sm);">
+        If you want to contribute, start with an
+        <a href="apply.html">engineering problem</a> from our open list.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>Est. 2025</span>
+    </div>
+  </footer>
+
+</body>
+</html>
+

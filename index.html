@@ -2,420 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hephaestus Quant</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #07090d;
-      --surface: rgba(14, 20, 30, 0.65);
-      --accent: #66e0ff;
-      --accent-strong: #5b7cff;
-      --glow: rgba(102, 224, 255, 0.4);
-      --text: #eef3ff;
-      --muted: rgba(238, 243, 255, 0.7);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: radial-gradient(circle at top, rgba(41, 70, 120, 0.35), transparent 55%),
-        radial-gradient(circle at 20% 40%, rgba(102, 224, 255, 0.16), transparent 45%),
-        linear-gradient(120deg, #06070b, #0b0f19 55%, #06070b 100%);
-      color: var(--text);
-      font-family: "Inter", system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-
-    .backdrop {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .orb {
-      position: absolute;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(102, 224, 255, 0.35), rgba(102, 224, 255, 0));
-      filter: blur(2px);
-      animation: drift 18s ease-in-out infinite;
-    }
-
-    .orb:nth-child(1) {
-      top: -80px;
-      right: 15%;
-      animation-delay: -4s;
-    }
-
-    .orb:nth-child(2) {
-      bottom: -120px;
-      left: 8%;
-      width: 420px;
-      height: 420px;
-      animation-delay: -8s;
-    }
-
-    .grid {
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.6), transparent 70%);
-    }
-
-    main {
-      position: relative;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-      gap: 3rem;
-      padding: 5rem 6vw 6rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      z-index: 1;
-    }
-
-    .hero {
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 0.9rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 20px;
-      height: 2px;
-      background: var(--accent);
-      border-radius: 999px;
-      box-shadow: 0 0 12px var(--glow);
-    }
-
-    h1 {
-      font-size: clamp(2.8rem, 5vw, 4.6rem);
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-    }
-
-    .hero p {
-      font-size: 1.15rem;
-      max-width: 520px;
-      color: var(--muted);
-    }
-
-    .cta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .btn {
-      padding: 0.85rem 1.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: linear-gradient(120deg, rgba(102, 224, 255, 0.2), rgba(91, 124, 255, 0.2));
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 600;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-    }
-
-    .btn.secondary {
-      background: rgba(14, 20, 30, 0.7);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.5), 0 0 18px var(--glow);
-    }
-
-    .ticker {
-      margin-top: 2rem;
-      padding: 0.8rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .ticker-track {
-      display: inline-flex;
-      gap: 2.5rem;
-      white-space: nowrap;
-      animation: ticker 18s linear infinite;
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
-    .ticker span strong {
-      color: var(--accent);
-      margin-right: 0.35rem;
-    }
-
-    .showcase {
-      display: grid;
-      gap: 1.6rem;
-      align-content: center;
-    }
-
-    .card {
-      background: var(--surface);
-      border-radius: 24px;
-      padding: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 30px 45px rgba(4, 7, 14, 0.7);
-      backdrop-filter: blur(18px);
-      position: relative;
-      overflow: hidden;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .card:nth-child(2) {
-      animation-delay: -3s;
-    }
-
-    .card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-    }
-
-    .metrics {
-      display: grid;
-      gap: 0.6rem;
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
-    .metrics span {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .metrics strong {
-      color: var(--text);
-    }
-
-    .chart {
-      margin-top: 1.25rem;
-      height: 120px;
-      background: linear-gradient(180deg, rgba(102, 224, 255, 0.15), rgba(6, 9, 13, 0.2));
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chart svg {
-      width: 100%;
-      height: 100%;
-    }
-
-    .floating-pics {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    .finance-pic {
-      position: absolute;
-      width: 140px;
-      height: 140px;
-      border-radius: 20px;
-      background: radial-gradient(circle at top, rgba(91, 124, 255, 0.4), rgba(7, 9, 13, 0));
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: grid;
-      place-items: center;
-      animation: spin 12s linear infinite;
-    }
-
-    .finance-pic svg {
-      width: 90px;
-      height: 90px;
-      opacity: 0.9;
-    }
-
-    .finance-pic:nth-child(1) {
-      top: 12%;
-      left: 6%;
-      animation-duration: 14s;
-    }
-
-    .finance-pic:nth-child(2) {
-      bottom: 14%;
-      right: 10%;
-      animation-direction: reverse;
-      animation-duration: 18s;
-    }
-
-    footer {
-      margin-top: 2rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    @keyframes drift {
-      0%,
-      100% {
-        transform: translateY(0) translateX(0);
-      }
-      50% {
-        transform: translateY(25px) translateX(-15px);
-      }
-    }
-
-    @keyframes float {
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-12px);
-      }
-    }
-
-    @keyframes ticker {
-      0% {
-        transform: translateX(0);
-      }
-      100% {
-        transform: translateX(-50%);
-      }
-    }
-
-    @keyframes spin {
-      0% {
-        transform: translateY(0) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-10px) rotate(10deg);
-      }
-      100% {
-        transform: translateY(0) rotate(0deg);
-      }
-    }
-
-    @media (max-width: 900px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-
-      .showcase {
-        order: -1;
-      }
-    }
-  </style>
+  <title>Hephaestus Quant</title>
+  <meta name="description" content="Systematic quantitative research at TU Delft. Factor research, regime analysis, and reproducible strategy evaluation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="backdrop">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="grid"></div>
-  </div>
 
-  <div class="floating-pics">
-    <div class="finance-pic">
-      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="14" y="58" width="14" height="40" rx="4" fill="#66E0FF"/>
-        <rect x="36" y="42" width="14" height="56" rx="4" fill="#8CA7FF"/>
-        <rect x="58" y="30" width="14" height="68" rx="4" fill="#66E0FF"/>
-        <rect x="80" y="20" width="14" height="78" rx="4" fill="#B3C4FF"/>
-        <path d="M12 20L38 48L68 32L98 18" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
-      </svg>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="research.html">Research</a>
+        <a href="kernel.html">Kernel</a>
+        <a href="doctrine.html">Doctrine</a>
+        <a href="governance.html">Governance</a>
+        <a href="about.html">About</a>
+        <a href="apply.html">Apply</a>
+      </nav>
     </div>
-    <div class="finance-pic">
-      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="60" cy="60" r="40" stroke="#66E0FF" stroke-width="8" opacity="0.7"/>
-        <path d="M60 20A40 40 0 1 1 24 44" stroke="#8CA7FF" stroke-width="8" stroke-linecap="round"/>
-        <path d="M42 68L56 54L68 66L82 40" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
-      </svg>
-    </div>
-  </div>
+  </header>
 
-  <main>
+  <main class="container">
+
     <section class="hero">
-      <div class="eyebrow">Quantitative Intelligence</div>
-      <h1>Hephaestus Quant forges alpha from global market signals.</h1>
-      <p>
-        Real-time research pipelines, adaptive factor models, and bespoke execution intelligence
-        engineered for sophisticated asset allocators.
+      <span class="label">TU Delft · Est. 2025</span>
+      <h1>Systematic quantitative research infrastructure.</h1>
+      <p class="subtitle">
+        We build methodology and infrastructure for reproducible factor research,
+        regime analysis, and evidence-based strategy evaluation.
       </p>
-      <div class="cta-row">
-        <a class="btn" href="#">Explore the platform</a>
-        <a class="btn secondary" href="#">Download strategy deck</a>
-      </div>
-      <div class="ticker" aria-hidden="true">
-        <div class="ticker-track">
-          <span><strong>FX</strong>Vol +12%</span>
-          <span><strong>Rates</strong>Curve steepener</span>
-          <span><strong>Equities</strong>Momentum +4.8%</span>
-          <span><strong>Commodities</strong>Carry +2.3%</span>
-          <span><strong>Crypto</strong>Liquidity pulse</span>
-          <span><strong>FX</strong>Vol +12%</span>
-          <span><strong>Rates</strong>Curve steepener</span>
-          <span><strong>Equities</strong>Momentum +4.8%</span>
-          <span><strong>Commodities</strong>Carry +2.3%</span>
-          <span><strong>Crypto</strong>Liquidity pulse</span>
-        </div>
-      </div>
-      <footer>Forging institutional-grade quantitative research with creative firepower.</footer>
+      <div class="meta">Quantamental · Factor models · Regime detection · Risk decomposition</div>
     </section>
 
-    <aside class="showcase">
-      <div class="card">
-        <h3>Signal Fabric</h3>
-        <div class="metrics">
-          <span>Assets monitored <strong>4,200+</strong></span>
-          <span>Latency target <strong>35 ms</strong></span>
-          <span>Signal refresh <strong>5s</strong></span>
+    <section>
+      <div class="grid-3">
+        <div class="card">
+          <span class="label">Research</span>
+          <h3>Quantamental analysis</h3>
+          <p>Factor decomposition, regime detection, risk attribution. We study what survives falsification.</p>
         </div>
-        <div class="chart">
-          <svg viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 95C40 70 60 85 90 60C120 35 150 50 175 35C200 20 230 30 270 15" stroke="#66E0FF" stroke-width="4" stroke-linecap="round"/>
-            <path d="M10 110H270" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-            <circle cx="175" cy="35" r="6" fill="#8CA7FF"/>
-          </svg>
+        <div class="card">
+          <span class="label">Infrastructure</span>
+          <h3>Kernel</h3>
+          <p>A modular Python research and backtesting engine built for systematic factor work. Open. Reproducible.</p>
+        </div>
+        <div class="card">
+          <span class="label">Governance</span>
+          <h3>Risk-first methodology</h3>
+          <p>Capital preservation bias. Regime awareness. Clear separation between research claims and deployable strategy.</p>
         </div>
       </div>
+    </section>
 
-      <div class="card">
-        <h3>Adaptive Hedging</h3>
-        <div class="metrics">
-          <span>Risk budget <strong>1.8%</strong></span>
-          <span>Drawdown guard <strong>Active</strong></span>
-          <span>Alpha horizon <strong>3-6M</strong></span>
-        </div>
-        <div class="chart">
-          <svg viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="20" y="50" width="20" height="50" rx="6" fill="#66E0FF" opacity="0.8"/>
-            <rect x="55" y="38" width="20" height="62" rx="6" fill="#8CA7FF" opacity="0.8"/>
-            <rect x="90" y="26" width="20" height="74" rx="6" fill="#66E0FF" opacity="0.8"/>
-            <rect x="125" y="18" width="20" height="82" rx="6" fill="#B3C4FF" opacity="0.8"/>
-            <rect x="160" y="30" width="20" height="70" rx="6" fill="#66E0FF" opacity="0.8"/>
-            <rect x="195" y="24" width="20" height="76" rx="6" fill="#8CA7FF" opacity="0.8"/>
-            <rect x="230" y="12" width="20" height="88" rx="6" fill="#66E0FF" opacity="0.9"/>
-          </svg>
-        </div>
+    <section>
+      <div class="section-header">
+        <span class="label">Active research</span>
+        <h2>Current questions</h2>
       </div>
-    </aside>
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">Factor</span>
+          <span class="item-text">Is momentum robust after transaction costs in European mid-caps?</span>
+        </li>
+        <li>
+          <span class="item-tag">Regime</span>
+          <span class="item-text">Does correlation instability cluster around volatility regime shifts?</span>
+        </li>
+        <li>
+          <span class="item-tag">Crowding</span>
+          <span class="item-text">Can factor decay be modeled as a function of crowding proxies?</span>
+        </li>
+        <li>
+          <span class="item-tag">Infrastructure</span>
+          <span class="item-text">Design a survivorship-bias–free data ingestion module for Kernel.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="cta-block">
+      <h2>We publish problems. You propose solutions.</h2>
+      <p>
+        Pick a research or engineering problem from our open list.
+        Submit a structured proposal. If the work is rigorous, we reach out.
+      </p>
+      <a href="apply.html" class="btn btn-primary">View open problems</a>
+    </section>
+
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>Est. 2025</span>
+    </div>
+  </footer>
+
 </body>
 </html>
