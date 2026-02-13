@@ -3,18 +3,19 @@
    ================================================ */
 
 :root {
-  --bg: #09090b;
-  --surface: #111114;
-  --surface-hover: #17171b;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.13);
+  --bg: #0B0D10;
+  --surface: #111318;
+  --surface-hover: #181B22;
+  --border: rgba(184, 156, 75, 0.07);
+  --border-strong: rgba(184, 156, 75, 0.16);
   --text: #d4d4da;
   --text-heading: #eaeaef;
   --text-secondary: #8a8a96;
   --muted: #5a5a66;
-  --accent: #a8876a;
-  --accent-hover: #bfa07e;
-  --accent-dim: rgba(168, 135, 106, 0.1);
+  --accent: #B89C4B;
+  --accent-hover: #C2A75E;
+  --accent-dim: rgba(184, 156, 75, 0.08);
+  --accent-strong: #A8842C;
   --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Fira Code', 'SF Mono', ui-monospace, monospace;
   --max-w: 1060px;
@@ -87,6 +88,12 @@ li {
   margin-bottom: 0.4rem;
 }
 
+/* ---- Semantic gold (principle-level signal words) ---- */
+
+.signal {
+  color: var(--accent);
+}
+
 /* ---- Labels ---- */
 
 .label {
@@ -94,7 +101,7 @@ li {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent-strong);
   display: block;
   margin-bottom: var(--space-xs);
 }
@@ -122,7 +129,7 @@ section:last-of-type {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(9, 9, 11, 0.88);
+  background: rgba(11, 13, 16, 0.88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
@@ -214,12 +221,47 @@ nav a.active {
   padding: var(--space-2xl) 0 var(--space-xl);
 }
 
+/* Hero with subtle background texture */
+.hero-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.06;
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  pointer-events: none;
+}
+
 .hero h1 {
   font-size: clamp(2.2rem, 4.5vw, 3.2rem);
   font-weight: 500;
   line-height: 1.12;
   margin-bottom: var(--space-md);
   max-width: 680px;
+}
+
+.hero h1::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: var(--accent);
+  margin-top: var(--space-sm);
+  opacity: 0.6;
 }
 
 .hero .subtitle {
@@ -241,14 +283,14 @@ nav a.active {
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 6px;
   padding: var(--space-md);
-  transition: border-color 0.2s;
+  transition: border-color 0.3s;
 }
 
 .card:hover {
-  border-color: var(--border-strong);
+  border-color: rgba(184, 156, 75, 0.15);
 }
 
 .card h3 {
@@ -300,14 +342,15 @@ nav a.active {
 }
 
 .btn-primary {
-  background: var(--accent-dim);
-  border-color: rgba(168, 135, 106, 0.35);
-  color: var(--accent-hover);
+  background: transparent;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .btn-primary:hover {
-  background: rgba(168, 135, 106, 0.18);
+  background: var(--accent);
   border-color: var(--accent);
+  color: var(--bg);
 }
 
 /* ---- Problem / Item lists ---- */
@@ -357,7 +400,7 @@ nav a.active {
 .principle-num {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: var(--muted);
+  color: var(--accent-strong);
   margin-bottom: 0.4rem;
 }
 
@@ -505,7 +548,7 @@ code {
     top: 56px;
     left: 0;
     right: 0;
-    background: rgba(9, 9, 11, 0.97);
+    background: rgba(11, 13, 16, 0.97);
     border-bottom: 1px solid var(--border);
     padding: var(--space-sm) var(--space-md) var(--space-md);
     gap: 0.1rem;
