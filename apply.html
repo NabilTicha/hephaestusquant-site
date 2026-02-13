@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Apply — Hephaestus Quant</title>
-  <meta name="description" content="Open research and engineering problems at Hephaestus Quant. Pick a problem, submit a proposal." />
+  <meta name="description" content="Open research and engineering problems at Hephaestus Quant." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -32,12 +32,11 @@
   <main class="container">
 
     <section class="hero">
-      <span class="label">Membership</span>
+      <span class="label">Apply</span>
       <h1>Open problems.</h1>
       <p class="subtitle">
-        We do not have a traditional application. Pick a problem.
-        Submit a structured solution proposal. If the thinking is rigorous,
-        we reach out.
+        No traditional application. Pick a problem, write a proposal.
+        If the thinking is solid, we'll reach out.
       </p>
     </section>
 
@@ -47,128 +46,117 @@
         <h2>How it works</h2>
       </div>
       <ol class="numbered-list">
-        <li>Review the open problems below — research or engineering.</li>
-        <li>Choose one that matches your interest and capability.</li>
-        <li>Write a structured proposal: problem framing, methodology, expected output, limitations.</li>
-        <li>Submit via the contact method at the bottom of this page.</li>
-        <li>We review proposals on a rolling basis. If the work demonstrates rigor, we will reach out.</li>
+        <li>Look through the problems below — research or engineering.</li>
+        <li>Pick one that matches what you're capable of and interested in.</li>
+        <li>Write a structured proposal: how you'd frame the problem, what methodology you'd use, what you'd expect to find, and what could go wrong.</li>
+        <li>Send it to us (contact info at the bottom).</li>
+        <li>We review on a rolling basis. If the work is rigorous, we get in touch.</li>
       </ol>
-      <p style="margin-top: var(--space-md); color: var(--text-secondary); font-size: 0.9rem;">
-        We are not looking for finished systems. We are looking for clear thinking,
-        honest problem framing, and an understanding of what you do not know.
-      </p>
+      <div class="aside-block" style="margin-top: var(--space-md);">
+        <p>
+          We're not expecting finished research. We want to see how you think about
+          a hard problem — clear framing, honest about limitations, aware of what you don't know.
+        </p>
+      </div>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Research problems</span>
+        <span class="label">Research</span>
         <h2>Open research questions</h2>
-        <p>These require statistical reasoning, financial knowledge, and methodological rigor.</p>
       </div>
       <ul class="item-list">
         <li>
-          <span class="item-tag">Factor · Equities</span>
-          <span class="item-text">Is momentum robust after transaction costs in European mid-caps?</span>
+          <span class="item-tag">R1 · Factor · Equities</span>
+          <span class="item-text">Is FF-UMD momentum robust after ~40bps round-trip costs in STOXX Europe Mid 200, 2005–2024?</span>
+          <span class="item-detail">Monthly rebalancing assumed. The key question is whether the signal survives in the mid-cap liquidity tier where execution costs dominate.</span>
         </li>
         <li>
-          <span class="item-tag">Regime · Correlation</span>
-          <span class="item-text">Does correlation instability cluster around volatility regime shifts?</span>
+          <span class="item-tag">R2 · Regime · Correlation</span>
+          <span class="item-text">Do cross-asset correlation breakdowns cluster near VIX regime transitions?</span>
+          <span class="item-detail">Test with DCC-GARCH on G10 equity indices. Is this structural or an artifact of 2008/2020 extreme samples?</span>
         </li>
         <li>
-          <span class="item-tag">Crowding · Factor decay</span>
-          <span class="item-text">Can factor decay be modeled as a function of crowding proxies?</span>
+          <span class="item-tag">R3 · Crowding · Factor decay</span>
+          <span class="item-text">Can value factor decay be modeled as a function of short interest concentration?</span>
+          <span class="item-detail">Fitting to post-2015 US large-cap. Challenge is separating crowding-driven decay from macro-driven decay.</span>
         </li>
         <li>
-          <span class="item-tag">Regime · Classification</span>
-          <span class="item-text">What is the minimum observation window for reliable regime classification?</span>
+          <span class="item-tag">R4 · Regime · Classification</span>
+          <span class="item-text">Minimum observation window for reliable 2-state HMM regime classification on realized vol.</span>
+          <span class="item-detail">We're seeing classification noise dominate below ~60 trading days. Is there a theoretical lower bound?</span>
         </li>
         <li>
-          <span class="item-tag">Factor · Liquidity</span>
-          <span class="item-text">How does factor exposure drift under varying liquidity conditions?</span>
+          <span class="item-tag">R5 · Factor · Liquidity</span>
+          <span class="item-text">How do factor loadings drift across Amihud illiquidity quintiles?</span>
+          <span class="item-detail">Rolling 12-month windows on European equities. Interested in whether liquidity acts as a regime variable for factor exposure.</span>
         </li>
       </ul>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Engineering problems</span>
+        <span class="label">Engineering</span>
         <h2>Open infrastructure tasks</h2>
-        <p>These require software engineering skill and an understanding of quantitative research workflows.</p>
       </div>
       <ul class="item-list">
         <li>
-          <span class="item-tag">Data · Kernel</span>
-          <span class="item-text">Design a survivorship-bias–free data ingestion module.</span>
+          <span class="item-tag">E1 · Data · Kernel</span>
+          <span class="item-text">Survivorship-bias-free data ingestion for European equities.</span>
+          <span class="item-detail">Kernel currently handles CRSP/Compustat. Need a Refinitiv Datastream adapter with point-in-time constituent lists.</span>
         </li>
         <li>
-          <span class="item-tag">Regime · Modeling</span>
-          <span class="item-text">Implement rolling regime detection using HMM or volatility state models.</span>
+          <span class="item-tag">E2 · Regime · Modeling</span>
+          <span class="item-text">Implement Markov-switching and threshold regime detection models for Kernel.</span>
+          <span class="item-detail">We have a 2-state Gaussian HMM. Need MS-VAR and SETAR implementations with the same interface.</span>
         </li>
         <li>
-          <span class="item-tag">Diagnostics · Kernel</span>
-          <span class="item-text">Build factor exposure diagnostics into the Kernel backtesting pipeline.</span>
+          <span class="item-tag">E3 · Diagnostics · Kernel</span>
+          <span class="item-text">Factor exposure diagnostics integrated into the backtesting pipeline.</span>
+          <span class="item-detail">Rolling factor loadings, exposure drift alerts, regime-conditional attribution. Output as structured YAML + optional plots.</span>
         </li>
       </ul>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">What we evaluate</span>
-        <h2>Submission criteria</h2>
+        <span class="label">Evaluation</span>
+        <h2>What we look for in proposals</h2>
       </div>
       <div class="grid-2">
         <div class="card">
           <h3>Problem understanding</h3>
-          <p>
-            Can you articulate why the problem is hard?
-            What are the failure modes? Where does naive
-            intuition break down?
-          </p>
+          <p>Can you explain why this is hard? Where does the naive approach fail? What are the edge cases?</p>
         </div>
         <div class="card">
           <h3>Methodology</h3>
-          <p>
-            Is the proposed approach falsifiable?
-            What would a negative result look like?
-            What are the statistical assumptions?
-          </p>
+          <p>Is your approach falsifiable? What does a negative result look like? What are you assuming?</p>
         </div>
         <div class="card">
-          <h3>Scope awareness</h3>
-          <p>
-            Does the proposal define clear boundaries?
-            What is explicitly out of scope?
-            Is the timeline realistic?
-          </p>
+          <h3>Scope</h3>
+          <p>Is the scope realistic? What's explicitly excluded? Don't try to solve everything at once.</p>
         </div>
         <div class="card">
-          <h3>Intellectual honesty</h3>
-          <p>
-            Are limitations stated upfront?
-            Is uncertainty acknowledged?
-            We value a precise "I don't know" over
-            a confident guess.
-          </p>
+          <h3>Honesty</h3>
+          <p>Are the limitations stated upfront? A good "I don't know how to handle X yet" beats a hand-wave every time.</p>
         </div>
       </div>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Submit</span>
-        <h2>Contact</h2>
+        <span class="label">Contact</span>
+        <h2>Submit</h2>
       </div>
       <p>
-        Send your proposal as a PDF or plain text document.
-        Include the problem identifier and a brief summary in the subject line.
+        Send your proposal as a PDF or plain text.
+        Put the problem ID (e.g. R1, E3) in the subject line.
       </p>
       <p style="margin-top: var(--space-sm);">
-        <span style="font-family: var(--font-mono); font-size: 0.88rem; color: var(--text-heading);">
-          apply@hephaestusquant.org
-        </span>
+        <code>apply@hephaestusquant.org</code>
       </p>
       <p style="margin-top: var(--space-sm); color: var(--text-secondary); font-size: 0.85rem;">
-        We review on a rolling basis. No deadline. No cohort system.
+        Rolling review. No deadlines, no cohorts.
       </p>
     </section>
 
@@ -177,10 +165,9 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span>Hephaestus Quant · TU Delft</span>
-      <span>Est. 2025</span>
+      <span>2025</span>
     </div>
   </footer>
 
 </body>
 </html>
-
