@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hephaestus Quant</title>
-  <meta name="description" content="Systematic quantitative research at TU Delft. Factor research, regime analysis, and reproducible strategy evaluation." />
+  <meta name="description" content="Quantitative research group at TU Delft. Factor research, regime analysis, backtesting infrastructure." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -32,31 +32,30 @@
   <main class="container">
 
     <section class="hero hero-bg" style="--hero-bg: url('pics/image2.png')">
-      <span class="label">TU Delft · Est. 2025</span>
-      <h1>Systematic quantitative research infrastructure.</h1>
+      <span class="label">TU Delft · Since Fall 2025</span>
+      <h1>Quantitative research infrastructure for people who want to do this properly.</h1>
       <p class="subtitle">
-        We build methodology and infrastructure for <span class="signal">reproducible</span> factor research,
-        regime analysis, and evidence-based strategy evaluation.
+        Small group. Factor models, regime detection, risk decomposition.
+        We build the backtesting and analysis tools ourselves. Everything is open-source.
       </p>
-      <div class="meta">Quantamental · Factor models · Regime detection · Risk decomposition</div>
     </section>
 
     <section>
       <div class="grid-3">
         <div class="card">
           <span class="label">Research</span>
-          <h3>Quantamental analysis</h3>
-          <p>Factor decomposition, regime detection, risk attribution. We study what survives <span class="signal">falsification</span>.</p>
+          <h3>Factor work</h3>
+          <p>We study what drives returns, how those drivers decay, and when they stop working. Most of our current time goes into finding reasons to reject hypotheses.</p>
         </div>
         <div class="card">
           <span class="label">Infrastructure</span>
           <h3>Kernel</h3>
-          <p>A modular Python research and backtesting engine built for systematic factor work. Open. Reproducible.</p>
+          <p>Our Python backtesting and research engine. Modular, no vendor lock-in, designed for factor research specifically. Still in early development — <a href="kernel.html">see current status</a>.</p>
         </div>
         <div class="card">
-          <span class="label">Governance</span>
-          <h3>Risk-first methodology</h3>
-          <p>Capital preservation bias. Regime awareness. Clear separation between research claims and deployable strategy.</p>
+          <span class="label">Process</span>
+          <h3>Risk-first</h3>
+          <p>We think about what can go wrong before we think about what might go right. Capital preservation over returns.</p>
         </div>
       </div>
     </section>
@@ -64,35 +63,31 @@
     <section>
       <div class="section-header">
         <span class="label">Active research</span>
-        <h2>Current questions</h2>
+        <h2>What we're working on</h2>
       </div>
       <ul class="item-list">
         <li>
-          <span class="item-tag">Factor</span>
-          <span class="item-text">Is momentum robust after transaction costs in European mid-caps?</span>
+          <span class="item-tag">Factor · Equities</span>
+          <span class="item-text">Fama-French UMD momentum in STOXX Europe Mid 200 after realistic transaction costs (~40bps round-trip), 2005–2024.</span>
         </li>
         <li>
-          <span class="item-tag">Regime</span>
-          <span class="item-text">Does correlation instability cluster around volatility regime shifts?</span>
+          <span class="item-tag">Regime · Correlation</span>
+          <span class="item-text">Testing whether cross-asset correlation breakdowns cluster near VIX regime transitions. Using DCC-GARCH on G10 equity indices.</span>
         </li>
         <li>
-          <span class="item-tag">Crowding</span>
-          <span class="item-text">Can factor decay be modeled as a function of crowding proxies?</span>
-        </li>
-        <li>
-          <span class="item-tag">Infrastructure</span>
-          <span class="item-text">Design a survivorship-bias–free data ingestion module for Kernel.</span>
+          <span class="item-tag">Crowding · Factor decay</span>
+          <span class="item-text">Modeling value factor decay as a function of short interest concentration — fitting to post-2015 US large-cap data.</span>
         </li>
       </ul>
     </section>
 
     <section class="cta-block">
-      <h2>We publish problems. You propose solutions.</h2>
+      <h2>Open problems</h2>
       <p>
-        Pick a research or engineering problem from our open list.
-        Submit a structured proposal. If the work is rigorous, we reach out.
+        We maintain a list of research and engineering problems.
+        Pick one, write a proposal, and if the work is good we'll reach out.
       </p>
-      <a href="apply.html" class="btn btn-primary">View open problems</a>
+      <a href="apply.html" class="btn btn-primary">View problems</a>
     </section>
 
   </main>
@@ -100,7 +95,7 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span>Hephaestus Quant · TU Delft</span>
-      <span>Est. 2025</span>
+      <span>2025</span>
     </div>
   </footer>
 

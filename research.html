@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Research — Hephaestus Quant</title>
-  <meta name="description" content="Quantamental research: factor decomposition, regime detection, and risk attribution at Hephaestus Quant." />
+  <meta name="description" content="Factor research, regime analysis, and risk decomposition at Hephaestus Quant." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -35,27 +35,26 @@
       <span class="label">Research</span>
       <h1>Quantamental research.</h1>
       <p class="subtitle">
-        We operate at the intersection of quantitative and fundamental analysis — systematic factor modeling
-        conditioned on regime-aware risk management.
+        Systematic factor modeling, conditioned on regime state.
+        We try to figure out what drives returns and — more usefully — when it stops working.
       </p>
     </section>
 
     <section>
       <div class="section-header">
         <span class="label">Approach</span>
-        <h2>What we do</h2>
+        <h2>How we work</h2>
       </div>
-      <div class="text-two-col">
+      <p>
+        We don't predict markets. We look for structural relationships in data, test whether
+        they hold out-of-sample, and discard what doesn't replicate. Most hypotheses don't survive
+        this process, which is the point — we'd rather know something is fragile before
+        committing capital to it.
+      </p>
+      <div class="aside-block" style="margin-top: var(--space-md);">
         <p>
-          We do not predict markets. We identify structural relationships,
-          test whether they survive out-of-sample, and discard what does not replicate.
-          Every claim is treated as a hypothesis subject to <span class="signal">falsification</span>.
-        </p>
-        <p>
-          Research output is evaluated on <span class="signal">reproducibility</span>, not conviction.
-          Negative results are documented with the same rigor as positive ones.
-          There is no distinction in our process between a failed hypothesis
-          and a successful one — both produce information.
+          Negative results get documented with the same rigor as positive ones.
+          A conclusive "this doesn't work" is a research output.
         </p>
       </div>
     </section>
@@ -63,31 +62,31 @@
     <section>
       <div class="section-header">
         <span class="label">Domains</span>
-        <h2>Focus areas</h2>
+        <h2>What we focus on</h2>
       </div>
       <div class="grid-3">
         <div class="card">
           <h3>Factor research</h3>
           <p>
-            Systematic identification, construction, and evaluation of return drivers
-            across equity, fixed income, and cross-asset universes. We study factor
-            decay, interaction effects, and the conditions under which factors fail.
+            Construction and evaluation of return drivers across equities and
+            cross-asset universes. We spend a lot of time on factor decay and
+            the conditions under which factors fail — that's where most of the
+            useful information is.
           </p>
         </div>
         <div class="card">
           <h3>Regime analysis</h3>
           <p>
-            Markets are non-stationary. We model volatility regimes, correlation
-            structure breaks, and macro state transitions to condition factor exposure
-            and risk allocation.
+            Markets aren't stationary. We model volatility regimes, correlation
+            structure breaks, and macro state transitions using HMMs and rolling
+            state models. This conditions everything else we do.
           </p>
         </div>
         <div class="card">
           <h3>Risk decomposition</h3>
           <p>
-            Understanding where risk comes from matters more than where return comes from.
-            We decompose portfolio risk into factor, idiosyncratic,
-            and regime components.
+            Breaking portfolio risk into factor, idiosyncratic, and regime components.
+            We care more about where risk comes from than where return comes from.
           </p>
         </div>
       </div>
@@ -95,30 +94,34 @@
 
     <section>
       <div class="section-header">
-        <span class="label">Open questions</span>
-        <h2>Active research problems</h2>
-        <p>These are questions we are currently investigating or seeking proposals for.</p>
+        <span class="label">Active</span>
+        <h2>Current research questions</h2>
       </div>
       <ul class="item-list">
         <li>
-          <span class="item-tag">Factor</span>
-          <span class="item-text">Is momentum robust after transaction costs in European mid-caps?</span>
+          <span class="item-tag">Factor · Equities</span>
+          <span class="item-text">Is FF-UMD momentum robust after ~40bps round-trip costs in STOXX Europe Mid 200, 2005–2024?</span>
+          <span class="item-detail">Testing with monthly rebalancing. Primary concern is whether the signal survives in the mid-cap liquidity tier.</span>
         </li>
         <li>
-          <span class="item-tag">Regime</span>
-          <span class="item-text">Does correlation instability cluster around volatility regime shifts?</span>
+          <span class="item-tag">Regime · Correlation</span>
+          <span class="item-text">Cross-asset correlation breakdowns near VIX regime transitions (25→40 range).</span>
+          <span class="item-detail">Using DCC-GARCH on G10 equity indices. Question is whether this is structural or an artifact of the 2008/2020 samples.</span>
         </li>
         <li>
           <span class="item-tag">Crowding</span>
-          <span class="item-text">Can factor decay be modeled as a function of crowding proxies?</span>
+          <span class="item-text">Short interest concentration as a crowding proxy for value factor decay.</span>
+          <span class="item-detail">Fitting to post-2015 US large-cap. Trying to separate crowding-driven decay from macro-driven decay.</span>
         </li>
         <li>
-          <span class="item-tag">Regime</span>
-          <span class="item-text">What is the minimum observation window for reliable regime classification?</span>
+          <span class="item-tag">Regime · Classification</span>
+          <span class="item-text">Minimum observation window for reliable 2-state HMM regime classification on realized vol.</span>
+          <span class="item-detail">Currently testing 60/120/252 day windows. Below 60 days, classification noise seems to dominate.</span>
         </li>
         <li>
-          <span class="item-tag">Factor</span>
-          <span class="item-text">How does factor exposure drift under varying liquidity conditions?</span>
+          <span class="item-tag">Factor · Liquidity</span>
+          <span class="item-text">Factor exposure drift under varying liquidity conditions in European equities.</span>
+          <span class="item-detail">Comparing factor loadings in top vs. bottom Amihud illiquidity quintiles, rolling 12-month.</span>
         </li>
       </ul>
     </section>
@@ -128,13 +131,13 @@
         <span class="label">Standards</span>
         <h2>Methodology</h2>
       </div>
-      <p style="margin-bottom: var(--space-md);">All research follows a <span class="signal">falsification-first</span> protocol:</p>
+      <p style="margin-bottom: var(--space-md);">Every research claim goes through the same <span class="signal">falsification-first</span> process:</p>
       <ol class="numbered-list">
-        <li>State a falsifiable hypothesis.</li>
-        <li>Define rejection criteria before running any test.</li>
-        <li>Use out-of-sample validation.</li>
-        <li>Report negative results.</li>
-        <li>Separate research claims from strategy deployment decisions.</li>
+        <li>State a falsifiable hypothesis with explicit rejection criteria.</li>
+        <li>Define the out-of-sample test before looking at results.</li>
+        <li>Run the test. Report what happened, including null results.</li>
+        <li>If it replicates, stress-test against regime subsamples and transaction cost assumptions.</li>
+        <li>Separate the research conclusion from any deployment decision — those are different processes with different criteria.</li>
       </ol>
     </section>
 
@@ -143,10 +146,9 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span>Hephaestus Quant · TU Delft</span>
-      <span>Est. 2025</span>
+      <span>2025</span>
     </div>
   </footer>
 
 </body>
 </html>
-

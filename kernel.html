@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kernel — Hephaestus Quant</title>
-  <meta name="description" content="Kernel: a modular Python-based quantitative research and backtesting infrastructure for systematic factor research." />
+  <meta name="description" content="Kernel: modular Python research and backtesting engine for systematic factor research." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -35,107 +35,78 @@
       <span class="label">Infrastructure</span>
       <h1>Kernel</h1>
       <p class="subtitle">
-        A modular Python-based quantitative research and backtesting infrastructure
-        built for systematic factor research, regime analysis, and <span class="signal">reproducible</span>
-        strategy evaluation.
+        Python-based research and backtesting engine. Built for factor research,
+        not for trading. Open-source when it's ready.
       </p>
-      <div class="meta">Python · Open source · Under active development</div>
+      <div class="meta">
+        <span class="status status--active">In development</span>
+      </div>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Positioning</span>
-        <h2>Why Kernel exists</h2>
+        <span class="label">Why</span>
+        <h2>The problem</h2>
       </div>
-      <div class="text-two-col">
-        <div>
-          <p>
-            Existing platforms like QuantConnect impose assumptions about strategy structure,
-            data access, and execution that constrain research. They optimize for deployment
-            convenience, not research rigor.
-          </p>
-        </div>
-        <div>
-          <p>
-            Kernel is built for the opposite priority: research-first infrastructure
-            where every component is open, inspectable, and replaceable.
-            No black boxes. No vendor lock-in. Full control over every assumption
-            in the pipeline.
-          </p>
-        </div>
-      </div>
+      <p>
+        Platforms like QuantConnect and Zipline make assumptions about strategy structure,
+        data access, and execution that get in the way of research. They're built to deploy
+        strategies, not to study them. If you want to do something like run a cross-sectional
+        momentum sort with regime-conditional rebalancing and custom transaction cost models,
+        you end up fighting the framework.
+      </p>
+      <p>
+        Kernel is the opposite: research-first, with every component exposed and replaceable.
+        No black boxes, no vendor lock-in.
+      </p>
     </section>
 
     <section>
       <div class="section-header">
         <span class="label">Design</span>
-        <h2>Architecture principles</h2>
+        <h2>How it's built</h2>
       </div>
-      <div class="grid-2">
-        <div class="card">
-          <h3>Modular</h3>
-          <p>
-            Each component — data ingestion, factor construction, backtesting,
-            risk analytics — is an independent module with a defined interface.
-            Replace any part without touching the rest.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Reproducible</h3>
-          <p>
-            Every research run produces a deterministic, versioned output.
-            Same inputs, same configuration, same result.
-            No hidden state.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Transparent</h3>
-          <p>
-            No proprietary layers between you and the computation.
-            All logic is readable source code. All assumptions are explicit
-            and documented in the pipeline configuration.
-          </p>
-        </div>
-        <div class="card">
-          <h3>Research-first</h3>
-          <p>
-            Kernel is not a trading platform. It is a research tool.
-            It is designed to answer questions about markets, not to execute trades.
-            Strategy evaluation is a research output, not a production system.
-          </p>
-        </div>
-      </div>
+      <dl class="def-grid">
+        <dt>Modular</dt>
+        <dd>Data ingestion, factor construction, backtesting, and risk analytics are independent modules. Replace any part without touching the rest.</dd>
+        <dt>Reproducible</dt>
+        <dd>Every research run is deterministic and versioned. Same inputs + same config = same output. We use hashed pipeline configs to track this.</dd>
+        <dt>Transparent</dt>
+        <dd>No proprietary layers. All logic is readable source. Assumptions are documented in pipeline YAML, not buried in code.</dd>
+        <dt>Python 3.11+</dt>
+        <dd>Built on NumPy, pandas, and statsmodels. Arch for GARCH modeling. hmmlearn for regime detection. Nothing exotic.</dd>
+      </dl>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Capabilities</span>
-        <h2>Core modules</h2>
+        <span class="label">Modules</span>
+        <h2>Current scope</h2>
       </div>
       <ul class="item-list">
         <li>
           <span class="item-tag">Data</span>
-          <span class="item-text">Survivorship-bias–aware data ingestion and normalization pipeline.</span>
+          <span class="item-text">Point-in-time data ingestion with survivorship-bias handling.</span>
+          <span class="item-detail">Currently supports CRSP/Compustat. Refinitiv Datastream adapter is in progress.</span>
         </li>
         <li>
           <span class="item-tag">Factors</span>
-          <span class="item-text">Factor construction framework with cross-sectional and time-series support.</span>
+          <span class="item-text">Cross-sectional and time-series factor construction framework.</span>
+          <span class="item-detail">Supports custom sort/portfolio construction. Winsorization, industry-neutralization built in.</span>
         </li>
         <li>
           <span class="item-tag">Backtest</span>
-          <span class="item-text">Event-driven and vectorized backtesting with configurable transaction cost models.</span>
+          <span class="item-text">Vectorized backtesting with configurable cost models.</span>
+          <span class="item-detail">Event-driven mode planned but not yet implemented.</span>
         </li>
         <li>
           <span class="item-tag">Risk</span>
-          <span class="item-text">Multi-level risk decomposition: factor, idiosyncratic, and regime components.</span>
+          <span class="item-text">Factor/idiosyncratic/regime risk decomposition.</span>
         </li>
         <li>
           <span class="item-tag">Regime</span>
-          <span class="item-text">Rolling regime detection using HMM and volatility state models.</span>
-        </li>
-        <li>
-          <span class="item-tag">Diagnostics</span>
-          <span class="item-text">Factor exposure analysis, decay diagnostics, and out-of-sample validation tooling.</span>
+          <span class="item-text">Rolling regime detection via 2-state Gaussian HMM on realized volatility.</span>
+          <span class="item-detail">Markov-switching and threshold models are next.</span>
         </li>
       </ul>
     </section>
@@ -143,14 +114,18 @@
     <section>
       <div class="section-header">
         <span class="label">Status</span>
-        <h2>Development</h2>
+        <h2>Where things stand</h2>
       </div>
       <p>
-        Kernel is under active internal development. Source will be released
-        as open-source infrastructure when core modules reach stability.
+        Kernel is under active internal development. Core modules (data, factors, vectorized backtest)
+        are functional and used in our research. Risk and regime modules are earlier-stage.
+      </p>
+      <p>
+        We'll open-source it when the API is stable enough that we won't need to break
+        backwards compatibility every two weeks. Not there yet.
       </p>
       <p style="margin-top: var(--space-sm);">
-        If you want to contribute, start with an
+        Want to help build it? Pick an
         <a href="apply.html">engineering problem</a> from our open list.
       </p>
     </section>
@@ -160,10 +135,9 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <span>Hephaestus Quant · TU Delft</span>
-      <span>Est. 2025</span>
+      <span>2025</span>
     </div>
   </footer>
 
 </body>
 </html>
-

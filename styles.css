@@ -1,5 +1,5 @@
 /* ================================================
-   Hephaestus Quant — Shared Styles
+   Hephaestus Quant — Styles
    ================================================ */
 
 :root {
@@ -8,10 +8,10 @@
   --surface-hover: #181B22;
   --border: rgba(184, 156, 75, 0.07);
   --border-strong: rgba(184, 156, 75, 0.16);
-  --text: #d4d4da;
-  --text-heading: #eaeaef;
-  --text-secondary: #8a8a96;
-  --muted: #5a5a66;
+  --text: #ccccd4;
+  --text-heading: #e8e8ef;
+  --text-secondary: #858592;
+  --muted: #555564;
   --accent: #B89C4B;
   --accent-hover: #C2A75E;
   --accent-dim: rgba(184, 156, 75, 0.08);
@@ -49,18 +49,48 @@ body {
   min-height: 100vh;
 }
 
+/* Film grain — adds analog texture, kills the clinical flat look */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* ---- Typography ---- */
 
 h1, h2, h3, h4, h5 {
   color: var(--text-heading);
   font-weight: 500;
   line-height: 1.2;
+}
+
+/* Mono h1 — gives the site a technical identity instead of generic startup */
+h1 {
+  font-family: var(--font-mono);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin-bottom: var(--space-md);
   letter-spacing: -0.01em;
 }
 
-h1 { font-size: clamp(2rem, 4vw, 3rem); }
-h2 { font-size: 1.4rem; margin-bottom: var(--space-md); }
-h3 { font-size: 1.05rem; margin-bottom: var(--space-xs); }
+h3 {
+  font-size: 1.02rem;
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.005em;
+}
 
 p {
   max-width: 640px;
@@ -98,8 +128,8 @@ li {
 
 .label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent-strong);
   display: block;
@@ -146,8 +176,9 @@ section:last-of-type {
 }
 
 .site-name {
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
   color: var(--text-heading);
   text-decoration: none;
   letter-spacing: 0.01em;
@@ -211,8 +242,10 @@ nav a.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   color: var(--muted);
+  letter-spacing: 0.02em;
 }
 
 /* ---- Hero ---- */
@@ -247,11 +280,8 @@ nav a.active {
 }
 
 .hero h1 {
-  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
-  font-weight: 500;
-  line-height: 1.12;
   margin-bottom: var(--space-md);
-  max-width: 680px;
+  max-width: 720px;
 }
 
 .hero h1::after {
@@ -265,18 +295,18 @@ nav a.active {
 }
 
 .hero .subtitle {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--text-secondary);
-  max-width: 520px;
+  max-width: 540px;
   line-height: 1.65;
 }
 
 .hero .meta {
   margin-top: var(--space-md);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 /* ---- Cards ---- */
@@ -284,7 +314,7 @@ nav a.active {
 .card {
   background: var(--surface);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 6px;
+  border-radius: 4px;
   padding: var(--space-md);
   transition: border-color 0.3s;
 }
@@ -294,12 +324,12 @@ nav a.active {
 }
 
 .card h3 {
-  font-size: 1rem;
+  font-size: 0.98rem;
   margin-bottom: var(--space-xs);
 }
 
 .card p {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
   line-height: 1.55;
 }
@@ -322,17 +352,18 @@ nav a.active {
 
 .btn {
   display: inline-block;
-  padding: 0.65rem 1.4rem;
-  font-size: 0.82rem;
+  padding: 0.6rem 1.3rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  font-family: var(--font-body);
+  font-family: var(--font-mono);
   border: 1px solid var(--border-strong);
-  border-radius: 4px;
+  border-radius: 3px;
   color: var(--text);
   text-decoration: none;
   transition: all 0.2s;
   background: transparent;
   cursor: pointer;
+  letter-spacing: 0.01em;
 }
 
 .btn:hover {
@@ -372,18 +403,26 @@ nav a.active {
 
 .item-list .item-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .item-list .item-text {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text);
   line-height: 1.5;
+}
+
+.item-list .item-detail {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+  display: block;
+  max-width: 640px;
 }
 
 /* ---- Principles (Doctrine page) ---- */
@@ -399,20 +438,20 @@ nav a.active {
 
 .principle-num {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--accent-strong);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
 .principle h3 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 500;
   margin-bottom: 0.4rem;
 }
 
 .principle p {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
 /* ---- Definition list ---- */
@@ -426,7 +465,7 @@ nav a.active {
 
 .def-grid dt {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -458,7 +497,7 @@ hr {
   padding: 0.6rem 0;
   padding-left: 2.4rem;
   position: relative;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
@@ -467,9 +506,9 @@ hr {
   position: absolute;
   left: 0;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--muted);
-  top: 0.75rem;
+  top: 0.72rem;
 }
 
 /* ---- Section header ---- */
@@ -484,7 +523,7 @@ hr {
 
 .section-header p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   margin-top: var(--space-sm);
 }
 
@@ -492,10 +531,10 @@ hr {
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.85em;
+  font-size: 0.83em;
   background: var(--surface);
-  padding: 0.15em 0.4em;
-  border-radius: 3px;
+  padding: 0.12em 0.35em;
+  border-radius: 2px;
   border: 1px solid var(--border);
 }
 
@@ -508,8 +547,41 @@ code {
 }
 
 .text-two-col p {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
+}
+
+/* ---- Accent left border block (for asides/notes) ---- */
+
+.aside-block {
+  border-left: 2px solid var(--border-strong);
+  padding-left: var(--space-md);
+  margin: var(--space-md) 0;
+}
+
+.aside-block p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+/* ---- Status badge ---- */
+
+.status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.status--active {
+  border-color: rgba(184, 156, 75, 0.3);
+  color: var(--accent);
+  background: var(--accent-dim);
 }
 
 /* ---- CTA block ---- */
@@ -519,13 +591,13 @@ code {
 }
 
 .cta-block h2 {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin-bottom: var(--space-sm);
 }
 
 .cta-block p {
   color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   margin-bottom: var(--space-md);
 }
 
@@ -591,7 +663,7 @@ code {
   }
 
   .hero h1 {
-    font-size: clamp(1.8rem, 6vw, 2.4rem);
+    font-size: clamp(1.5rem, 5vw, 2rem);
   }
 }
 
@@ -600,4 +672,3 @@ code {
     padding: 0 1.2rem;
   }
 }
-
