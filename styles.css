@@ -425,6 +425,81 @@ nav a.active {
   max-width: 640px;
 }
 
+/* ---- Research problem blocks (Apply page) ---- */
+
+.problem-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  transition: border-color 0.3s;
+}
+
+.problem-block:last-child {
+  margin-bottom: 0;
+}
+
+.problem-block:hover {
+  border-color: rgba(184, 156, 75, 0.12);
+}
+
+.problem-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.problem-id {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.problem-title {
+  font-size: 1.05rem;
+  margin-bottom: 0;
+  color: var(--text-heading);
+}
+
+.problem-meta {
+  margin: 0;
+}
+
+.problem-meta dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: var(--space-sm);
+  margin-bottom: 0.25rem;
+}
+
+.problem-meta dt:first-child {
+  margin-top: 0;
+}
+
+.problem-meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.problem-meta dd ul {
+  margin-top: 0.35rem;
+  padding-left: 1.2rem;
+}
+
+.problem-meta dd li {
+  margin-bottom: 0.25rem;
+}
+
 /* ---- Principles (Doctrine page) ---- */
 
 .principle {

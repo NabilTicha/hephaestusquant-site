@@ -46,7 +46,7 @@
         <h2>How it works</h2>
       </div>
       <ol class="numbered-list">
-        <li>Look through the problems below — research or engineering.</li>
+        <li>Look through the research problems below.</li>
         <li>Pick one that matches what you're capable of and interested in.</li>
         <li>Write a structured proposal: how you'd frame the problem, what methodology you'd use, what you'd expect to find, and what could go wrong.</li>
         <li>Send it to us (contact info at the bottom).</li>
@@ -63,59 +63,58 @@
     <section>
       <div class="section-header">
         <span class="label">Research</span>
-        <h2>Open research questions</h2>
+        <h2>Open problems</h2>
       </div>
-      <ul class="item-list">
-        <li>
-          <span class="item-tag">R1 · Factor · Equities</span>
-          <span class="item-text">Is FF-UMD momentum robust after ~40bps round-trip costs in STOXX Europe Mid 200, 2005–2024?</span>
-          <span class="item-detail">Monthly rebalancing assumed. The key question is whether the signal survives in the mid-cap liquidity tier where execution costs dominate.</span>
-        </li>
-        <li>
-          <span class="item-tag">R2 · Regime · Correlation</span>
-          <span class="item-text">Do cross-asset correlation breakdowns cluster near VIX regime transitions?</span>
-          <span class="item-detail">Test with DCC-GARCH on G10 equity indices. Is this structural or an artifact of 2008/2020 extreme samples?</span>
-        </li>
-        <li>
-          <span class="item-tag">R3 · Crowding · Factor decay</span>
-          <span class="item-text">Can value factor decay be modeled as a function of short interest concentration?</span>
-          <span class="item-detail">Fitting to post-2015 US large-cap. Challenge is separating crowding-driven decay from macro-driven decay.</span>
-        </li>
-        <li>
-          <span class="item-tag">R4 · Regime · Classification</span>
-          <span class="item-text">Minimum observation window for reliable 2-state HMM regime classification on realized vol.</span>
-          <span class="item-detail">We're seeing classification noise dominate below ~60 trading days. Is there a theoretical lower bound?</span>
-        </li>
-        <li>
-          <span class="item-tag">R5 · Factor · Liquidity</span>
-          <span class="item-text">How do factor loadings drift across Amihud illiquidity quintiles?</span>
-          <span class="item-detail">Rolling 12-month windows on European equities. Interested in whether liquidity acts as a regime variable for factor exposure.</span>
-        </li>
-      </ul>
-    </section>
 
-    <section>
-      <div class="section-header">
-        <span class="label">Engineering</span>
-        <h2>Open infrastructure tasks</h2>
-      </div>
-      <ul class="item-list">
-        <li>
-          <span class="item-tag">E1 · Data · Kernel</span>
-          <span class="item-text">Survivorship-bias-free data ingestion for European equities.</span>
-          <span class="item-detail">Kernel currently handles CRSP/Compustat. Need a Refinitiv Datastream adapter with point-in-time constituent lists.</span>
-        </li>
-        <li>
-          <span class="item-tag">E2 · Regime · Modeling</span>
-          <span class="item-text">Implement Markov-switching and threshold regime detection models for Kernel.</span>
-          <span class="item-detail">We have a 2-state Gaussian HMM. Need MS-VAR and SETAR implementations with the same interface.</span>
-        </li>
-        <li>
-          <span class="item-tag">E3 · Diagnostics · Kernel</span>
-          <span class="item-text">Factor exposure diagnostics integrated into the backtesting pipeline.</span>
-          <span class="item-detail">Rolling factor loadings, exposure drift alerts, regime-conditional attribution. Output as structured YAML + optional plots.</span>
-        </li>
-      </ul>
+      <article class="problem-block">
+        <header class="problem-header">
+          <span class="problem-id">Research Problem 01</span>
+          <h3 class="problem-title">Covariance Regularization and Out-of-Sample Risk Stability</h3>
+        </header>
+        <dl class="problem-meta">
+          <dt>Research Question</dt>
+          <dd>Does eigenvalue cleaning or shrinkage-based regularization of the sample covariance matrix improve out-of-sample portfolio variance, drawdown, and weight stability relative to the raw sample estimator?</dd>
+          <dt>Motivation</dt>
+          <dd>In high-dimensional settings, the sample covariance matrix is noisy and poorly conditioned. Optimization based on unstable covariance estimates often leads to extreme weights and fragile diversification.</dd>
+          <dt>Objective</dt>
+          <dd>Evaluate whether covariance regularization techniques (e.g. shrinkage, eigenvalue filtering, factor-based models) produce more stable and robust portfolios under realistic sampling conditions.</dd>
+          <dt>Evaluation Metrics</dt>
+          <dd>
+            <ul>
+              <li>Realized out-of-sample volatility</li>
+              <li>Maximum drawdown</li>
+              <li>Portfolio weight turnover</li>
+              <li>Concentration measures (e.g. Herfindahl index)</li>
+              <li>Condition number / eigenvalue dispersion</li>
+            </ul>
+          </dd>
+        </dl>
+      </article>
+
+      <article class="problem-block">
+        <header class="problem-header">
+          <span class="problem-id">Research Problem 02</span>
+          <h3 class="problem-title">Optimal Memory in Covariance Estimation Under Regime Shifts</h3>
+        </header>
+        <dl class="problem-meta">
+          <dt>Research Question</dt>
+          <dd>What is the optimal memory parameter (lookback horizon or decay rate) for covariance estimation under regime transitions, and how does it impact realized volatility, turnover, and drawdown?</dd>
+          <dt>Motivation</dt>
+          <dd>Risk models face a structural tradeoff: short memory → reactive but noisy; long memory → stable but slow to adapt. During volatility shocks such as the Global Financial Crisis or the COVID-19 market crash, delayed adaptation can materially increase drawdown.</dd>
+          <dt>Objective</dt>
+          <dd>Quantify the stability–reactivity tradeoff and determine whether adaptive memory schemes improve out-of-sample risk control relative to static lookback windows.</dd>
+          <dt>Evaluation Metrics</dt>
+          <dd>
+            <ul>
+              <li>Realized volatility forecast error</li>
+              <li>Maximum drawdown</li>
+              <li>Ulcer index</li>
+              <li>Turnover and transaction cost impact</li>
+              <li>Time-to-recovery</li>
+            </ul>
+          </dd>
+        </dl>
+      </article>
     </section>
 
     <section>
@@ -150,10 +149,10 @@
       </div>
       <p>
         Send your proposal as a PDF or plain text.
-        Put the problem ID (e.g. R1, E3) in the subject line.
+        Reference the problem (e.g. Research Problem 01) in the subject line.
       </p>
       <p style="margin-top: var(--space-sm);">
-        <code>apply@hephaestusquant.org</code>
+        <code>info@hephaestusquant.org</code>
       </p>
       <p style="margin-top: var(--space-sm); color: var(--text-secondary); font-size: 0.85rem;">
         Rolling review. No deadlines, no cohorts.
