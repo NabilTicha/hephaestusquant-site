@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kernel — Hephaestus Quant</title>
-  <meta name="description" content="Kernel: modular Python research and backtesting engine for systematic factor research." />
+  <meta name="description" content="Kernel: research infrastructure. Currently sec master and clean data; backtest engine and more planned." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -19,10 +19,8 @@
         <span></span><span></span><span></span>
       </button>
       <nav>
-        <a href="research.html">Research</a>
         <a href="kernel.html" class="active">Kernel</a>
         <a href="doctrine.html">Doctrine</a>
-        <a href="governance.html">Governance</a>
         <a href="about.html">About</a>
         <a href="apply.html">Apply</a>
       </nav>
@@ -35,8 +33,8 @@
       <span class="label">Infrastructure</span>
       <h1>Kernel</h1>
       <p class="subtitle">
-        Python-based research and backtesting engine. Built for factor research,
-        not for trading. Open-source when it's ready.
+        Research infrastructure. Right now: sec master and clean data.
+        Future plans: backtest engine, factor framework, risk and regime tooling. Open-source when ready.
       </p>
       <div class="meta">
         <span class="status status--active">In development</span>
@@ -56,77 +54,44 @@
         you end up fighting the framework.
       </p>
       <p>
-        Kernel is the opposite: research-first, with every component exposed and replaceable.
-        No black boxes, no vendor lock-in.
+        Kernel is intended to be research-first: every component exposed and replaceable,
+        no black boxes, no vendor lock-in. We're building toward that.
       </p>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Design</span>
-        <h2>How it's built</h2>
+        <span class="label">Current</span>
+        <h2>What's in place</h2>
       </div>
-      <dl class="def-grid">
-        <dt>Modular</dt>
-        <dd>Data ingestion, factor construction, backtesting, and risk analytics are independent modules. Replace any part without touching the rest.</dd>
-        <dt>Reproducible</dt>
-        <dd>Every research run is deterministic and versioned. Same inputs + same config = same output. We use hashed pipeline configs to track this.</dd>
-        <dt>Transparent</dt>
-        <dd>No proprietary layers. All logic is readable source. Assumptions are documented in pipeline YAML, not buried in code.</dd>
-        <dt>Python 3.11+</dt>
-        <dd>Built on NumPy, pandas, and statsmodels. Arch for GARCH modeling. hmmlearn for regime detection. Nothing exotic.</dd>
-      </dl>
+      <p>
+        Right now Kernel has <strong>sec master</strong> and <strong>clean data</strong> — the foundation for
+        point-in-time, survivorship-aware research. Everything else builds on that.
+      </p>
     </section>
 
     <section>
       <div class="section-header">
-        <span class="label">Modules</span>
-        <h2>Current scope</h2>
+        <span class="label">Planned</span>
+        <h2>Future scope</h2>
       </div>
       <ul class="item-list">
         <li>
-          <span class="item-tag">Data</span>
-          <span class="item-text">Point-in-time data ingestion with survivorship-bias handling.</span>
-          <span class="item-detail">Currently supports CRSP/Compustat. Refinitiv Datastream adapter is in progress.</span>
+          <span class="item-tag">Backtest engine</span>
+          <span class="item-text">Vectorized backtesting with configurable cost models, designed for factor research.</span>
         </li>
         <li>
-          <span class="item-tag">Factors</span>
-          <span class="item-text">Cross-sectional and time-series factor construction framework.</span>
-          <span class="item-detail">Supports custom sort/portfolio construction. Winsorization, industry-neutralization built in.</span>
+          <span class="item-tag">Factor framework</span>
+          <span class="item-text">Cross-sectional and time-series factor construction, sort/portfolio logic, winsorization, neutralization.</span>
         </li>
         <li>
-          <span class="item-tag">Backtest</span>
-          <span class="item-text">Vectorized backtesting with configurable cost models.</span>
-          <span class="item-detail">Event-driven mode planned but not yet implemented.</span>
-        </li>
-        <li>
-          <span class="item-tag">Risk</span>
-          <span class="item-text">Factor/idiosyncratic/regime risk decomposition.</span>
-        </li>
-        <li>
-          <span class="item-tag">Regime</span>
-          <span class="item-text">Rolling regime detection via 2-state Gaussian HMM on realized volatility.</span>
-          <span class="item-detail">Markov-switching and threshold models are next.</span>
+          <span class="item-tag">Risk & regime</span>
+          <span class="item-text">Factor/idiosyncratic/regime decomposition; regime detection (e.g. HMM on realized vol).</span>
         </li>
       </ul>
-    </section>
-
-    <section>
-      <div class="section-header">
-        <span class="label">Status</span>
-        <h2>Where things stand</h2>
-      </div>
-      <p>
-        Kernel is under active internal development. Core modules (data, factors, vectorized backtest)
-        are functional and used in our research. Risk and regime modules are earlier-stage.
-      </p>
-      <p>
-        We'll open-source it when the API is stable enough that we won't need to break
-        backwards compatibility every two weeks. Not there yet.
-      </p>
-      <p style="margin-top: var(--space-sm);">
-        Want to help build it? Pick an
-        <a href="apply.html">engineering problem</a> from our open list.
+      <p style="margin-top: var(--space-md);">
+        Design target: modular, reproducible (hashed configs, same inputs → same output), transparent Python.
+        We'll open-source when the API is stable enough not to break every few weeks. Not there yet.
       </p>
     </section>
 
