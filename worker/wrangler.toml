@@ -1,0 +1,13 @@
+name = "hephaestus-forecast-cron"
+main = "src/index.ts"
+compatibility_date = "2024-12-30"
+
+[triggers]
+crons = [
+  "0 22 * * 1-5",  # Weekday prices (10 PM UTC, after US close)
+  "0 0 * * *",     # Daily crypto + resolution
+]
+
+[vars]
+API_BASE_URL = ""
+INTERNAL_API_SECRET = ""

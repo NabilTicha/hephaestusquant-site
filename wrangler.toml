@@ -1,0 +1,18 @@
+name = "hephaestusquant-site"
+compatibility_date = "2024-12-30"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "FORECAST_DB"
+database_name = "hephaestus-forecast"
+database_id = "8b20c7bb-4c7f-4f7f-9a87-afbbf18624be"
+
+[vars]
+GOOGLE_CLIENT_ID = "480867618969-594njhrle4smdl0qbbulqc0kb6mk71s0.apps.googleusercontent.com"
+GOOGLE_REDIRECT_URI = "https://hephaestusquant.org/api/auth/google/callback"
+SITE_URL = "https://hephaestusquant.org"
+
+# GOOGLE_CLIENT_SECRET and JWT_SECRET should be set as encrypted secrets:
+# wrangler pages secret put GOOGLE_CLIENT_SECRET
+# wrangler pages secret put JWT_SECRET
+# wrangler pages secret put INTERNAL_API_SECRET

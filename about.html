@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>About — Hephaestus Quant</title>
-  <meta name="description" content="About Hephaestus Quant — a quantitative research group at TU Delft." />
+  <title>About · Hephaestus Quant</title>
+  <meta name="description" content="About Hephaestus Quant, a quantitative research group at TU Delft." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <a href="/" class="site-name">Hephaestus Quant</a>
       <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
       <nav>
-        <a href="kernel.html">Kernel</a>
-        <a href="doctrine.html">Doctrine</a>
-        <a href="about.html" class="active">About</a>
-        <a href="apply.html">Apply</a>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <a href="/forecast.html">Forecast</a>
+        <a href="/about.html" class="active">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
       </nav>
     </div>
   </header>
@@ -37,11 +40,11 @@
     <section>
       <p>
         We're a small quantitative research group at TU Delft. Started in Fall 2025
-        with a handful of people who wanted to do factor research properly — with real
+        with a handful of people who wanted to do factor research properly, with real
         methodology, not stock-picking dressed up in quantitative language.
       </p>
       <p>
-        The group builds research infrastructure (<a href="kernel.html">Kernel</a>: currently sec master and clean data; backtest engine and more planned), studies
+        The group builds research infrastructure (<a href="/kernel.html">Kernel</a>: currently sec master and clean data; backtest engine and more planned), studies
         factor-based investing, and tries to understand market regimes. We're small by design:
         a few people working on hard problems with high standards is more useful than a large
         group producing surface-level work.
@@ -61,7 +64,7 @@
         <dt>Focus</dt>
         <dd>Factor models, regime analysis, risk decomposition, backtesting infrastructure</dd>
         <dt>Software</dt>
-        <dd><a href="kernel.html">Kernel</a> — Research stack; sec master and clean data now, backtest engine etc. planned</dd>
+        <dd><a href="/kernel.html">Kernel</a>: research stack; sec master and clean data now, backtest engine etc. planned</dd>
         <dt>Capital</dt>
         <dd>Members invest independently. We don't manage money as a group.</dd>
       </dl>
@@ -89,7 +92,7 @@
       <p>
         Greek god of the forge. The craftsman, not the warrior. We liked the idea of naming
         a research group after the figure who builds the tools rather than the one who uses them.
-        It seemed honest about what we actually do most of the time — infrastructure work.
+        It seemed honest about what we actually do most of the time: infrastructure work.
       </p>
     </section>
 
@@ -99,7 +102,7 @@
         We evaluate people on the quality of their thinking.
         Pick a problem from our open list and submit a proposal.
       </p>
-      <a href="apply.html" class="btn btn-primary">Open problems</a>
+      <a href="/apply.html" class="btn btn-primary">Open problems</a>
     </section>
 
   </main>
@@ -110,6 +113,8 @@
       <span>2025</span>
     </div>
   </footer>
+
+  <script src="/js/auth.js"></script>
 
 </body>
 </html>

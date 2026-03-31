@@ -3,33 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kernel — Hephaestus Quant</title>
+  <title>Kernel · Hephaestus Quant</title>
   <meta name="description" content="Kernel: research infrastructure. Currently sec master and clean data; backtest engine and more planned." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
 
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="site-name">Hephaestus Quant</a>
+      <a href="/" class="site-name">Hephaestus Quant</a>
       <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
       <nav>
-        <a href="kernel.html" class="active">Kernel</a>
-        <a href="doctrine.html">Doctrine</a>
-        <a href="about.html">About</a>
-        <a href="apply.html">Apply</a>
+        <a href="/kernel.html" class="active">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <a href="/forecast.html">Forecast</a>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
       </nav>
     </div>
   </header>
 
   <main class="container">
 
-    <section class="hero hero-bg" style="--hero-bg: url('pics/image4.png')">
+    <section class="hero hero-bg" style="--hero-bg: url('/pics/image4.png')">
       <span class="label">Infrastructure</span>
       <h1>Kernel</h1>
       <p class="subtitle">
@@ -65,7 +68,7 @@
         <h2>What's in place</h2>
       </div>
       <p>
-        Right now Kernel has <strong>sec master</strong> and <strong>clean data</strong> — the foundation for
+        Right now Kernel has <strong>sec master</strong> and <strong>clean data</strong>, the foundation for
         point-in-time, survivorship-aware research. Everything else builds on that.
       </p>
     </section>
@@ -89,10 +92,6 @@
           <span class="item-text">Factor/idiosyncratic/regime decomposition; regime detection (e.g. HMM on realized vol).</span>
         </li>
       </ul>
-      <p style="margin-top: var(--space-md);">
-        Design target: modular, reproducible (hashed configs, same inputs → same output), transparent Python.
-        We'll open-source when the API is stable enough not to break every few weeks. Not there yet.
-      </p>
     </section>
 
   </main>
@@ -103,6 +102,8 @@
       <span>2025</span>
     </div>
   </footer>
+
+  <script src="/js/auth.js"></script>
 
 </body>
 </html>

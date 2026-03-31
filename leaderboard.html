@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leaderboard · Hephaestus Quant</title>
+  <meta name="description" content="Forecasting leaderboard. Ranked by CRPS, calibration, sharpness, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html" class="active">Leaderboard</a>
+        <a href="/forecast.html">Forecast</a>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <span class="label">Forecasting</span>
+      <h1>Leaderboard</h1>
+      <p class="subtitle">
+        Ranked by distributional forecast accuracy across multiple scoring dimensions.
+        Submit your own forecasts to join.
+      </p>
+    </section>
+
+    <section>
+      <div class="filter-bar">
+        <div class="filter-group" id="horizon-filters">
+          <span class="label" style="margin-right: 0.5rem; margin-bottom: 0; align-self: center;">Horizon</span>
+          <button class="filter-btn active" data-horizon="all">All</button>
+          <button class="filter-btn" data-horizon="1w">1W</button>
+          <button class="filter-btn" data-horizon="1m">1M</button>
+          <button class="filter-btn" data-horizon="3m">3M</button>
+          <button class="filter-btn" data-horizon="1y">1Y</button>
+        </div>
+        <div class="filter-group" id="metric-filters">
+          <span class="label" style="margin-right: 0.5rem; margin-bottom: 0; align-self: center;">Metric</span>
+          <button class="filter-btn active" data-metric="avg_crps">CRPS</button>
+          <button class="filter-btn" data-metric="calibration_80">Calibration</button>
+          <button class="filter-btn" data-metric="avg_sharpness_80">Sharpness</button>
+          <button class="filter-btn" data-metric="directional_accuracy">Direction</button>
+          <button class="filter-btn" data-metric="avg_median_error_pct">Median Error</button>
+        </div>
+      </div>
+
+      <div id="leaderboard-content">
+        <div class="loading">Loading leaderboard...</div>
+      </div>
+    </section>
+
+    <section class="cta-block">
+      <h2>Join the leaderboard</h2>
+      <p>Forecast price distributions for any asset in our universe and get scored automatically.</p>
+      <a href="/forecast.html" class="btn btn-primary">Submit a forecast</a>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>2025</span>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/leaderboard.js"></script>
+
+</body>
+</html>

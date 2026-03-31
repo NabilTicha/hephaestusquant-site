@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile · Hephaestus Quant</title>
+  <meta name="description" content="Forecaster profile and analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <a href="/forecast.html">Forecast</a>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero" id="profile-hero">
+      <div class="loading">Loading profile...</div>
+    </section>
+
+    <section id="scores-section" style="display:none;">
+      <div class="section-header">
+        <span class="label">Performance</span>
+        <h2>Aggregate scores</h2>
+      </div>
+      <div class="score-cards" id="score-cards"></div>
+    </section>
+
+    <section id="calibration-section" style="display:none;">
+      <div class="section-header">
+        <span class="label">Calibration</span>
+        <h2>Interval coverage</h2>
+        <p>How often actual prices fell within your predicted intervals.</p>
+      </div>
+      <div class="chart-container" style="height: 240px;">
+        <canvas id="cal-chart"></canvas>
+      </div>
+    </section>
+
+    <section id="forecasts-section" style="display:none;">
+      <div class="section-header">
+        <span class="label">History</span>
+        <h2>Forecast history</h2>
+      </div>
+      <ul class="forecast-list" id="forecast-list"></ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>2025</span>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/profile.js"></script>
+
+</body>
+</html>
