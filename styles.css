@@ -989,6 +989,131 @@ input[type="number"].form-input::-webkit-outer-spin-button {
   position: relative;
 }
 
+/* ---- Forecast painter ---- */
+
+.painter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 900px;
+}
+
+.painter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.painter-group-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.painter-btn-row,
+.painter-slider-row,
+.painter-range-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.painter-slider-row label,
+.painter-range-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.painter-slider-row input[type="range"] {
+  width: 110px;
+  accent-color: var(--accent);
+}
+
+.painter-range-row .form-input {
+  width: 84px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.tool-btn {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.tool-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.tool-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.painter-canvas-wrap {
+  position: relative;
+  max-width: 900px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: var(--space-sm);
+}
+
+#forecast-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.painter-readout {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: rgba(17, 19, 24, 0.75);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  pointer-events: none;
+  min-height: 1.2em;
+}
+
+.painter-status {
+  margin-top: 0.6rem;
+  max-width: 900px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.painter-status .complete {
+  color: var(--accent-hover);
+}
+
 /* ---- Form errors ---- */
 
 .form-errors {

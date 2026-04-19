@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -63,70 +62,66 @@
         <div id="selected-asset" class="selected-asset" style="display:none;"></div>
       </div>
 
-      <div id="quantile-form" style="display:none;">
+      <div id="painter-form" style="display:none;">
         <div class="section-header" style="margin-top: var(--space-xl);">
           <span class="label">Step 2</span>
-          <h2>Your price distribution</h2>
-          <p>For each horizon, provide your 10th, 25th, 50th (median), 75th, and 90th percentile price estimates.</p>
+          <h2>Paint your price distribution</h2>
+          <p>Brush where you think the price will be across the next year. Darker = more probable. Every weekly column should have some paint before you can submit.</p>
         </div>
 
-        <div class="horizon-grid">
-          <div class="horizon-card" data-horizon="1w">
-            <h3><span class="horizon-label">1 Week</span> <span class="horizon-date" id="date-1w"></span></h3>
-            <div class="quantile-inputs">
-              <div class="q-row"><label>P10</label><input type="number" step="any" class="form-input q-input" data-q="p10" placeholder="10th %ile" /></div>
-              <div class="q-row"><label>P25</label><input type="number" step="any" class="form-input q-input" data-q="p25" placeholder="25th %ile" /></div>
-              <div class="q-row"><label>P50</label><input type="number" step="any" class="form-input q-input" data-q="p50" placeholder="Median" /></div>
-              <div class="q-row"><label>P75</label><input type="number" step="any" class="form-input q-input" data-q="p75" placeholder="75th %ile" /></div>
-              <div class="q-row"><label>P90</label><input type="number" step="any" class="form-input q-input" data-q="p90" placeholder="90th %ile" /></div>
+        <div class="painter-controls">
+          <div class="painter-group">
+            <span class="painter-group-label">Tool</span>
+            <div class="painter-btn-row">
+              <button class="tool-btn active" data-tool="brush" type="button">Brush</button>
+              <button class="tool-btn" data-tool="eraser" type="button">Eraser</button>
             </div>
-            <textarea class="form-input q-justification" data-horizon="1w" placeholder="Justification (optional)..." rows="3"></textarea>
           </div>
 
-          <div class="horizon-card" data-horizon="1m">
-            <h3><span class="horizon-label">1 Month</span> <span class="horizon-date" id="date-1m"></span></h3>
-            <div class="quantile-inputs">
-              <div class="q-row"><label>P10</label><input type="number" step="any" class="form-input q-input" data-q="p10" placeholder="10th %ile" /></div>
-              <div class="q-row"><label>P25</label><input type="number" step="any" class="form-input q-input" data-q="p25" placeholder="25th %ile" /></div>
-              <div class="q-row"><label>P50</label><input type="number" step="any" class="form-input q-input" data-q="p50" placeholder="Median" /></div>
-              <div class="q-row"><label>P75</label><input type="number" step="any" class="form-input q-input" data-q="p75" placeholder="75th %ile" /></div>
-              <div class="q-row"><label>P90</label><input type="number" step="any" class="form-input q-input" data-q="p90" placeholder="90th %ile" /></div>
+          <div class="painter-group">
+            <span class="painter-group-label">History</span>
+            <div class="painter-btn-row">
+              <button class="tool-btn" data-action="undo" type="button">Undo</button>
+              <button class="tool-btn" data-action="redo" type="button">Redo</button>
+              <button class="tool-btn" data-action="clear" type="button">Clear</button>
             </div>
-            <textarea class="form-input q-justification" data-horizon="1m" placeholder="Justification (optional)..." rows="3"></textarea>
           </div>
 
-          <div class="horizon-card" data-horizon="3m">
-            <h3><span class="horizon-label">3 Months</span> <span class="horizon-date" id="date-3m"></span></h3>
-            <div class="quantile-inputs">
-              <div class="q-row"><label>P10</label><input type="number" step="any" class="form-input q-input" data-q="p10" placeholder="10th %ile" /></div>
-              <div class="q-row"><label>P25</label><input type="number" step="any" class="form-input q-input" data-q="p25" placeholder="25th %ile" /></div>
-              <div class="q-row"><label>P50</label><input type="number" step="any" class="form-input q-input" data-q="p50" placeholder="Median" /></div>
-              <div class="q-row"><label>P75</label><input type="number" step="any" class="form-input q-input" data-q="p75" placeholder="75th %ile" /></div>
-              <div class="q-row"><label>P90</label><input type="number" step="any" class="form-input q-input" data-q="p90" placeholder="90th %ile" /></div>
+          <div class="painter-group">
+            <span class="painter-group-label">Brush</span>
+            <div class="painter-slider-row">
+              <label>Radius<input type="range" min="0.02" max="0.3" step="0.005" value="0.08" id="brush-radius" /></label>
+              <label>Strength<input type="range" min="0.05" max="1" step="0.01" value="0.4" id="brush-opacity" /></label>
             </div>
-            <textarea class="form-input q-justification" data-horizon="3m" placeholder="Justification (optional)..." rows="3"></textarea>
           </div>
 
-          <div class="horizon-card" data-horizon="1y">
-            <h3><span class="horizon-label">1 Year</span> <span class="horizon-date" id="date-1y"></span></h3>
-            <div class="quantile-inputs">
-              <div class="q-row"><label>P10</label><input type="number" step="any" class="form-input q-input" data-q="p10" placeholder="10th %ile" /></div>
-              <div class="q-row"><label>P25</label><input type="number" step="any" class="form-input q-input" data-q="p25" placeholder="25th %ile" /></div>
-              <div class="q-row"><label>P50</label><input type="number" step="any" class="form-input q-input" data-q="p50" placeholder="Median" /></div>
-              <div class="q-row"><label>P75</label><input type="number" step="any" class="form-input q-input" data-q="p75" placeholder="75th %ile" /></div>
-              <div class="q-row"><label>P90</label><input type="number" step="any" class="form-input q-input" data-q="p90" placeholder="90th %ile" /></div>
+          <div class="painter-group">
+            <span class="painter-group-label">Price range</span>
+            <div class="painter-range-row">
+              <label>Min<input type="number" step="any" id="price-min" class="form-input" /></label>
+              <label>Max<input type="number" step="any" id="price-max" class="form-input" /></label>
+              <button class="tool-btn" data-action="reset-range" type="button">Reset</button>
             </div>
-            <textarea class="form-input q-justification" data-horizon="1y" placeholder="Justification (optional)..." rows="3"></textarea>
+          </div>
+
+          <div class="painter-group">
+            <span class="painter-group-label">View</span>
+            <div class="painter-btn-row">
+              <button class="tool-btn" data-action="toggle-view" id="view-toggle" type="button">Show as PDF</button>
+            </div>
           </div>
         </div>
 
-        <div class="section-header" style="margin-top: var(--space-xl);">
-          <span class="label">Preview</span>
-          <h2>Distribution preview</h2>
+        <div class="painter-canvas-wrap">
+          <canvas id="forecast-canvas"></canvas>
+          <div id="painter-readout" class="painter-readout"></div>
         </div>
-        <div class="chart-container">
-          <canvas id="dist-chart"></canvas>
+
+        <div class="painter-status">
+          <span id="coverage-text">Coverage: 0 / 52 weeks painted</span>
         </div>
+
+        <textarea class="form-input" id="painter-justification" placeholder="Justification (optional)..." rows="3" style="margin-top: var(--space-md); max-width: 900px;"></textarea>
 
         <div id="form-errors" class="form-errors" style="display:none;"></div>
 
