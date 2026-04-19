@@ -1,4 +1,4 @@
-import { signJWT } from '../../../shared/jwt';
+import { signJWT } from '../../../../shared/jwt';
 
 export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   const url = new URL(request.url);
