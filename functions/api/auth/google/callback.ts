@@ -1,5 +1,32 @@
 import { signJWT } from '../../../../shared/jwt';
 
+const encoder = new TextEncoder();
+const STATE_TTL_SECONDS = 10 * 60;
+
+function base64urlDecode(s: string): Uint8Array {
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  while (s.length % 4) s += '=';
+  const bin = atob(s);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return buf;
+}
+
+async function verifyState(state: string, secret: string): Promise<boolean> {
+  const parts = state.split('.');
+  if (parts.length !== 3) return false;
+  const [nonce, ts, sigB64] = parts;
+
+  const age = Math.floor(Date.now() / 1000) - parseInt(ts, 10);
+  if (!isFinite(age) || age < -5 || age > STATE_TTL_SECONDS) return false;
+
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
+  );
+  const sig = base64urlDecode(sigB64);
+  return crypto.subtle.verify('HMAC', key, sig.buffer as ArrayBuffer, encoder.encode(`${nonce}.${ts}`));
+}
+
 export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
@@ -9,23 +36,9 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
     return new Response('Missing code or state', { status: 400 });
   }
 
-  const cookie = request.headers.get('Cookie') || '';
-  const savedState = cookie.match(/(?:^|;\s*)hq_oauth_state=([^;]+)/)?.[1];
-  if (state !== savedState) {
-    const debug = {
-      error: 'Invalid state',
-      urlState: state,
-      cookieHeaderPresent: !!request.headers.get('Cookie'),
-      cookieHeaderLength: cookie.length,
-      cookieNamesSeen: cookie.split(/;\s*/).map(c => c.split('=')[0]).filter(Boolean),
-      hqOauthStateFound: savedState !== undefined,
-      hqOauthStateValue: savedState ?? null,
-      matches: state === savedState,
-    };
-    return new Response(JSON.stringify(debug, null, 2), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  const stateValid = await verifyState(state, env.JWT_SECRET);
+  if (!stateValid) {
+    return new Response('Invalid or expired state', { status: 403 });
   }
 
   const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -85,14 +98,12 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   }, env.JWT_SECRET);
 
   const cookieHeader = `hq_token=${jwt}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${7 * 24 * 60 * 60}`;
-  const clearState = 'hq_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0';
 
   return new Response(null, {
     status: 302,
     headers: new Headers([
       ['Location', env.SITE_URL || '/'],
       ['Set-Cookie', cookieHeader],
-      ['Set-Cookie', clearState],
     ]),
   });
 };
