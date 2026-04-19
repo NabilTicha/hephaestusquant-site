@@ -12,7 +12,20 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   const cookie = request.headers.get('Cookie') || '';
   const savedState = cookie.match(/(?:^|;\s*)hq_oauth_state=([^;]+)/)?.[1];
   if (state !== savedState) {
-    return new Response('Invalid state', { status: 403 });
+    const debug = {
+      error: 'Invalid state',
+      urlState: state,
+      cookieHeaderPresent: !!request.headers.get('Cookie'),
+      cookieHeaderLength: cookie.length,
+      cookieNamesSeen: cookie.split(/;\s*/).map(c => c.split('=')[0]).filter(Boolean),
+      hqOauthStateFound: savedState !== undefined,
+      hqOauthStateValue: savedState ?? null,
+      matches: state === savedState,
+    };
+    return new Response(JSON.stringify(debug, null, 2), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
