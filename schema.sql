@@ -3,6 +3,7 @@
 DROP TABLE IF EXISTS leaderboard_cache;
 DROP TABLE IF EXISTS forecast_scores;
 DROP TABLE IF EXISTS forecast_horizons;
+DROP TABLE IF EXISTS forecast_grids;
 DROP TABLE IF EXISTS forecasts;
 DROP TABLE IF EXISTS price_snapshots;
 DROP TABLE IF EXISTS assets;
@@ -37,7 +38,23 @@ CREATE TABLE forecasts (
   user_id TEXT NOT NULL REFERENCES users(id),
   asset_id TEXT NOT NULL REFERENCES assets(id),
   reference_price REAL NOT NULL,
+  horizon_days INTEGER,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- 2D PDF grid painted by the user. grid is N_T * N_P bytes, row-major,
+-- where each row is one time column (t from 0..N_T-1) and each column is
+-- a price bin (p from 0..N_P-1, low to high). Values are uint8 where
+-- 255 = per-column max; the grid is thus already per-column max-normalised.
+CREATE TABLE forecast_grids (
+  forecast_id TEXT PRIMARY KEY REFERENCES forecasts(id) ON DELETE CASCADE,
+  n_t INTEGER NOT NULL,
+  n_p INTEGER NOT NULL,
+  price_min REAL NOT NULL,
+  price_max REAL NOT NULL,
+  grid BLOB NOT NULL,
+  compression TEXT NOT NULL DEFAULT 'none',
+  justification TEXT
 );
 
 CREATE TABLE forecast_horizons (

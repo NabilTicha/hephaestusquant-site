@@ -1,10 +1,12 @@
 // Forecast page: asset picker + 2D probability-density painter.
-// Grid represents p(price, t). Time axis is 52 weekly columns from now → 1y,
-// price axis is N_P linear bins between price-min and price-max.
+// Grid represents p(price, t). Time axis is N_T columns from now → user's
+// chosen horizon (horizon_days); price axis is N_P linear bins between
+// priceMin and priceMax. N_T and N_P are fixed regardless of horizon so
+// storage size is constant; column width (in days) = horizon_days / N_T.
 
 const ForecastForm = (() => {
   // ---- Config ----
-  const N_T = 52;            // weekly columns over 1 year
+  const N_T = 64;            // time columns
   const N_P = 200;           // price bins
   const UNDO_LIMIT = 40;
   const DEFAULT_RANGE_FACTOR = [0.5, 1.5]; // [min, max] multiplier on spot
@@ -13,6 +15,7 @@ const ForecastForm = (() => {
   let assets = [];
   let selectedAsset = null;
   let spot = null;
+  let horizonDays = 365;     // total forecast horizon in days
 
   // Painter state
   let density = new Float32Array(N_T * N_P); // row-major: idx = t*N_P + p
@@ -156,6 +159,9 @@ const ForecastForm = (() => {
     const viewBtn = document.getElementById('view-toggle');
     if (viewBtn) viewBtn.textContent = 'Show as PDF';
 
+    horizonDays = 365;
+    setHorizonInputs(horizonDays);
+    updateHorizonSummary();
     setDefaultPriceRange();
 
     if (!painterBound) {
@@ -178,6 +184,37 @@ const ForecastForm = (() => {
     document.getElementById('price-max').value = priceMax;
   }
 
+  function horizonFromUnit(value, unit) {
+    switch (unit) {
+      case 'days': return Math.round(value);
+      case 'weeks': return Math.round(value * 7);
+      case 'months': return Math.round(value * 30);
+      case 'years': return Math.round(value * 365);
+      default: return Math.round(value);
+    }
+  }
+  function setHorizonInputs(days) {
+    // Pick the coarsest unit that still represents the value exactly.
+    let unit = 'days', value = days;
+    if (days % 365 === 0) { unit = 'years'; value = days / 365; }
+    else if (days % 30 === 0) { unit = 'months'; value = days / 30; }
+    else if (days % 7 === 0) { unit = 'weeks'; value = days / 7; }
+    document.getElementById('horizon-value').value = value;
+    document.getElementById('horizon-unit').value = unit;
+  }
+  function updateHorizonSummary() {
+    const el = document.getElementById('horizon-summary');
+    if (!el) return;
+    const d = new Date();
+    d.setDate(d.getDate() + horizonDays);
+    const end = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const colDays = horizonDays / N_T;
+    const colDesc = colDays >= 1
+      ? `${colDays.toFixed(colDays >= 10 ? 0 : 1)}d/col`
+      : `${(colDays * 24).toFixed(1)}h/col`;
+    el.textContent = `→ ${end} · ${colDesc}`;
+  }
+
   function setupPainterControls() {
     document.querySelectorAll('[data-tool]').forEach(btn => {
       btn.onclick = () => {
@@ -185,6 +222,26 @@ const ForecastForm = (() => {
         document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b === btn));
       };
     });
+
+    const onHorizonChange = () => {
+      const val = parseFloat(document.getElementById('horizon-value').value);
+      const unit = document.getElementById('horizon-unit').value;
+      const newDays = horizonFromUnit(val, unit);
+      if (!Number.isFinite(newDays) || newDays < 1) return;
+      if (density.some(v => v > 0) && newDays !== horizonDays) {
+        if (!confirm('Changing the horizon will clear your painting. Continue?')) {
+          setHorizonInputs(horizonDays);
+          return;
+        }
+        density.fill(0);
+      }
+      horizonDays = newDays;
+      updateHorizonSummary();
+      dirtyRender = true;
+      updateCoverage();
+    };
+    document.getElementById('horizon-value').onchange = onHorizonChange;
+    document.getElementById('horizon-unit').onchange = onHorizonChange;
 
     document.querySelector('[data-action="undo"]').onclick = undo;
     document.querySelector('[data-action="redo"]').onclick = redo;
@@ -391,7 +448,7 @@ const ForecastForm = (() => {
     for (let t = 0; t < N_T; t++) if (sums[t] > 1e-6) filled++;
     const el = document.getElementById('coverage-text');
     if (el) {
-      el.textContent = `Coverage: ${filled} / ${N_T} weeks painted`;
+      el.textContent = `Coverage: ${filled} / ${N_T} columns painted`;
       el.classList.toggle('complete', filled === N_T);
     }
   }
@@ -438,18 +495,17 @@ const ForecastForm = (() => {
       ctx.stroke();
     }
 
-    // Time (x) ticks: weeks 0, 13, 26, 39, 52 — labelled as dates.
+    // Time (x) ticks: 5 evenly spaced fractions of the horizon.
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     const now = new Date();
-    const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const ticks = [0, 13, 26, 39, 52];
-    for (const w of ticks) {
-      const frac = w / N_T;
-      const x = plot.x + frac * plot.w;
+    const fracs = [0, 0.25, 0.5, 0.75, 1];
+    for (const f of fracs) {
+      const x = plot.x + f * plot.w;
+      const days = Math.round(f * horizonDays);
       const d = new Date(now);
-      d.setDate(d.getDate() + w * 7);
-      ctx.fillText(w === 0 ? 'Now' : fmt(d), x, plot.y + plot.h + 6);
+      d.setDate(d.getDate() + days);
+      ctx.fillText(f === 0 ? 'Now' : formatHorizonTick(days, d), x, plot.y + plot.h + 6);
       ctx.strokeStyle = 'rgba(184, 156, 75, 0.05)';
       ctx.beginPath();
       ctx.moveTo(x, plot.y);
@@ -457,6 +513,15 @@ const ForecastForm = (() => {
       ctx.stroke();
     }
     ctx.restore();
+  }
+
+  function formatHorizonTick(days, date) {
+    // Short tick label: date for <= 2y, years+date beyond that.
+    if (horizonDays <= 2 * 365) {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    const years = days / 365;
+    return years.toFixed(years >= 10 ? 0 : 1) + 'y';
   }
 
   function drawDensity(plot) {
@@ -528,13 +593,16 @@ const ForecastForm = (() => {
   }
 
   function drawHorizonMarkers(plot) {
-    // Faint vertical markers at 1w, 1m, 3m, 1y-ish for reference.
+    // Faint dashed markers at meaningful sub-horizons (1w, 1m, 3m, 1y)
+    // if they fall inside the painter's time range.
+    const marks = [7, 30, 91, 365];
     ctx.save();
     ctx.strokeStyle = 'rgba(184, 156, 75, 0.12)';
     ctx.setLineDash([2, 4]);
-    const marks = [1, 4, 13]; // weeks; 52 already shown by tick
-    for (const w of marks) {
-      const x = plot.x + (w / N_T) * plot.w;
+    for (const days of marks) {
+      if (days >= horizonDays) continue;
+      const frac = days / horizonDays;
+      const x = plot.x + frac * plot.w;
       ctx.beginPath();
       ctx.moveTo(x, plot.y);
       ctx.lineTo(x, plot.y + plot.h);
@@ -556,20 +624,20 @@ const ForecastForm = (() => {
     if (!readout) return;
     if (!p.inside) { readout.textContent = ''; return; }
     const price = priceMin + p.ny * (priceMax - priceMin);
-    const week = Math.min(N_T - 1, Math.max(0, Math.floor(p.nx * N_T)));
+    const col = Math.min(N_T - 1, Math.max(0, Math.floor(p.nx * N_T)));
+    const days = Math.round((col + 0.5) / N_T * horizonDays);
     const d = new Date();
-    d.setDate(d.getDate() + week * 7);
+    d.setDate(d.getDate() + days);
     const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Marginal P(price in ±1% bin) at this week, using normalised column.
     const sums = columnSums();
-    const cs = sums[week];
+    const cs = sums[col];
     let marg = 0;
     if (cs > 0) {
       const bin = Math.min(N_P - 1, Math.max(0, Math.floor(p.ny * N_P)));
-      marg = density[week * N_P + bin] / cs;
+      marg = density[col * N_P + bin] / cs;
     }
-    readout.textContent = `week ${week} (${dateStr}) · $${price.toFixed(2)} · p≈${(marg * 100).toFixed(2)}%`;
+    readout.textContent = `t+${days}d (${dateStr}) · $${price.toFixed(2)} · p\u2248${(marg * 100).toFixed(2)}%`;
   }
 
   // ---- Errors ----
@@ -582,8 +650,17 @@ const ForecastForm = (() => {
     document.getElementById('form-errors').style.display = 'none';
   }
 
-  // ---- Submit (STUBBED for Phase 1) ----
-  function submit() {
+  function toBase64(bytes) {
+    // chunk to avoid arg-length limits on large arrays
+    let bin = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(bin);
+  }
+
+  async function submit() {
     hideErrors();
     if (!selectedAsset) { showErrors(['Please select an asset first.']); return; }
 
@@ -591,11 +668,14 @@ const ForecastForm = (() => {
     const missing = [];
     for (let t = 0; t < N_T; t++) if (sums[t] <= 1e-6) missing.push(t);
     if (missing.length > 0) {
-      showErrors([`Paint every weekly column before submitting. Missing weeks: ${missing.join(', ')}`]);
+      showErrors([`Paint every time column before submitting. Missing columns: ${missing.join(', ')}`]);
       return;
     }
-    if (!isFinite(priceMin) || !isFinite(priceMax) || priceMin >= priceMax) {
-      showErrors(['Price range is invalid.']); return;
+    if (!isFinite(priceMin) || !isFinite(priceMax) || priceMin >= priceMax || priceMin <= 0) {
+      showErrors(['Price range is invalid. Both must be positive and max > min.']); return;
+    }
+    if (!Number.isInteger(horizonDays) || horizonDays < 1) {
+      showErrors(['Horizon must be a positive integer number of days.']); return;
     }
 
     // Per-column-normalised PDF, quantised to uint8 (0..255 relative to column max).
@@ -608,34 +688,69 @@ const ForecastForm = (() => {
       }
       for (let p = 0; p < N_P; p++) {
         const v = density[t * N_P + p];
-        grid[t * N_P + p] = colMax > 0 ? Math.round((v / colMax) * 255) : 0;
+        // Ensure every painted column has at least one non-zero byte after
+        // quantisation; otherwise the backend's "empty column" check will
+        // reject submissions where a weak stroke rounded to zero everywhere.
+        const q = colMax > 0 ? Math.round((v / colMax) * 255) : 0;
+        grid[t * N_P + p] = q;
       }
+      // Safety: if the entire column rounded to zero (shouldn't happen, but
+      // floating-point is floating-point), paint a 1 at the bin with the
+      // largest original value.
+      let any = 0;
+      let argmax = 0;
+      let argmaxVal = -1;
+      for (let p = 0; p < N_P; p++) {
+        const v = density[t * N_P + p];
+        if (v > argmaxVal) { argmaxVal = v; argmax = p; }
+        any |= grid[t * N_P + p];
+      }
+      if (any === 0) grid[t * N_P + argmax] = 1;
     }
 
     const payload = {
       asset_id: selectedAsset.id,
-      grid_version: 1,
+      horizon_days: horizonDays,
       n_t: N_T,
       n_p: N_P,
-      t_start_days: 0,
-      t_end_days: 7 * N_T,
       price_min: priceMin,
       price_max: priceMax,
-      reference_price: spot,
-      // For now: quantised per-column max-normalised grid as a plain array.
-      // Phase 2 will base64 + gzip this and POST to /api/forecasts.
-      grid_uint8_sample: Array.from(grid.slice(0, 40)),
-      grid_size_bytes: grid.byteLength,
+      grid_b64: toBase64(grid),
       justification: document.getElementById('painter-justification').value.trim() || undefined,
     };
 
-    console.log('[Forecast stub] would submit:', payload);
-    console.log('[Forecast stub] full grid (Uint8Array):', grid);
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
 
-    document.getElementById('forecast-form-section').style.display = 'none';
-    document.getElementById('success-section').style.display = '';
-    const msg = document.getElementById('success-msg');
-    if (msg) msg.textContent = `Prototype: grid serialised (${grid.byteLength} bytes). See console for payload. Nothing was submitted to the server.`;
+    try {
+      const res = await fetch('/api/forecasts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showErrors([data.error || 'Submission failed.']);
+        btn.disabled = false;
+        btn.textContent = 'Submit forecast';
+        return;
+      }
+
+      document.getElementById('forecast-form-section').style.display = 'none';
+      document.getElementById('success-section').style.display = '';
+      const msg = document.getElementById('success-msg');
+      if (msg) {
+        msg.textContent = `Forecast saved (${grid.byteLength.toLocaleString()} bytes). ` +
+          `Horizon: ${horizonDays} days. Will be scored as time passes.`;
+      }
+      const link = document.getElementById('view-forecast-link');
+      if (link && Auth.getUser()) link.href = `/profile.html?id=${Auth.getUser().id}`;
+    } catch (e) {
+      showErrors(['Network error. Please try again.']);
+      btn.disabled = false;
+      btn.textContent = 'Submit forecast';
+    }
   }
 
   init();

@@ -1,50 +1,42 @@
 import { getUser, jsonResponse, errorResponse } from '../../../shared/auth-middleware';
 
-interface HorizonInput {
-  p10: number;
-  p25: number;
-  p50: number;
-  p75: number;
-  p90: number;
+interface ForecastGridBody {
+  asset_id: string;
+  horizon_days: number;
+  n_t: number;
+  n_p: number;
+  price_min: number;
+  price_max: number;
+  grid_b64: string;        // base64 of Uint8Array length n_t * n_p, per-column max-normalised
   justification?: string;
 }
 
-interface ForecastBody {
-  asset_id: string;
-  horizons: {
-    '1w': HorizonInput;
-    '1m': HorizonInput;
-    '3m': HorizonInput;
-    '1y': HorizonInput;
-  };
+const MAX_HORIZON_DAYS = 365 * 20;  // 20 years; beyond this scoring is meaningless
+const MAX_GRID_CELLS = 64 * 400;    // hard cap on decoded grid size to prevent abuse
+
+function base64Decode(s: string): Uint8Array {
+  const bin = atob(s);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return buf;
 }
 
-function addDays(date: Date, days: number): string {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
-}
-
-function targetDateForHorizon(horizon: string, now: Date): string {
-  switch (horizon) {
-    case '1w': return addDays(now, 7);
-    case '1m': return addDays(now, 30);
-    case '3m': return addDays(now, 91);
-    case '1y': return addDays(now, 365);
-    default: throw new Error(`Unknown horizon: ${horizon}`);
+function validateBody(body: ForecastGridBody): string | null {
+  if (!body.asset_id || typeof body.asset_id !== 'string') return 'asset_id required';
+  if (!Number.isInteger(body.horizon_days) || body.horizon_days < 1 || body.horizon_days > MAX_HORIZON_DAYS) {
+    return `horizon_days must be an integer in [1, ${MAX_HORIZON_DAYS}]`;
   }
-}
-
-function validateQuantiles(h: HorizonInput, label: string): string | null {
-  const fields = ['p10', 'p25', 'p50', 'p75', 'p90'] as const;
-  for (const f of fields) {
-    if (typeof h[f] !== 'number' || isNaN(h[f]) || h[f] <= 0) {
-      return `${label}.${f} must be a positive number`;
-    }
+  if (!Number.isInteger(body.n_t) || !Number.isInteger(body.n_p) || body.n_t < 4 || body.n_p < 4) {
+    return 'n_t and n_p must be integers >= 4';
   }
-  if (h.p10 >= h.p25 || h.p25 >= h.p50 || h.p50 >= h.p75 || h.p75 >= h.p90) {
-    return `${label} quantiles must be strictly increasing: p10 < p25 < p50 < p75 < p90`;
+  if (body.n_t * body.n_p > MAX_GRID_CELLS) {
+    return `grid too large (${body.n_t}x${body.n_p} = ${body.n_t * body.n_p} cells; max ${MAX_GRID_CELLS})`;
   }
+  if (!isFinite(body.price_min) || !isFinite(body.price_max) || body.price_min >= body.price_max) {
+    return 'price_min and price_max must be finite with price_min < price_max';
+  }
+  if (body.price_min <= 0) return 'price_min must be > 0';
+  if (typeof body.grid_b64 !== 'string' || body.grid_b64.length === 0) return 'grid_b64 required';
   return null;
 }
 
@@ -52,9 +44,34 @@ export const onRequestPost: CFPagesFunction = async ({ request, env }) => {
   const user = await getUser(request, env.JWT_SECRET);
   if (!user) return errorResponse('Not authenticated', 401);
 
-  const body = await request.json() as ForecastBody;
-  if (!body.asset_id || !body.horizons) {
-    return errorResponse('Missing asset_id or horizons');
+  let body: ForecastGridBody;
+  try {
+    body = await request.json() as ForecastGridBody;
+  } catch {
+    return errorResponse('Invalid JSON body');
+  }
+
+  const validationErr = validateBody(body);
+  if (validationErr) return errorResponse(validationErr);
+
+  let gridBytes: Uint8Array;
+  try {
+    gridBytes = base64Decode(body.grid_b64);
+  } catch {
+    return errorResponse('grid_b64 is not valid base64');
+  }
+  const expectedLen = body.n_t * body.n_p;
+  if (gridBytes.length !== expectedLen) {
+    return errorResponse(`grid length mismatch: got ${gridBytes.length} bytes, expected ${expectedLen}`);
+  }
+
+  // Reject grids where any time column is entirely zero (not a valid PDF there).
+  for (let t = 0; t < body.n_t; t++) {
+    let any = 0;
+    for (let p = 0; p < body.n_p; p++) any |= gridBytes[t * body.n_p + p];
+    if (any === 0) {
+      return errorResponse(`time column ${t} is empty; every column must have some density`);
+    }
   }
 
   const asset = await env.FORECAST_DB.prepare(
@@ -62,43 +79,30 @@ export const onRequestPost: CFPagesFunction = async ({ request, env }) => {
   ).bind(body.asset_id).first();
   if (!asset) return errorResponse('Asset not found', 404);
 
-  const horizonKeys = ['1w', '1m', '3m', '1y'] as const;
-  for (const h of horizonKeys) {
-    if (!body.horizons[h]) return errorResponse(`Missing horizon: ${h}`);
-    const err = validateQuantiles(body.horizons[h], h);
-    if (err) return errorResponse(err);
-  }
-
   const latestPrice = await env.FORECAST_DB.prepare(
     'SELECT price FROM price_snapshots WHERE asset_id = ?1 ORDER BY date DESC LIMIT 1'
   ).bind(body.asset_id).first<{ price: number }>();
-
   const referencePrice = latestPrice?.price ?? 0;
 
   const forecastId = crypto.randomUUID();
-  const now = new Date();
+  const now = new Date().toISOString();
 
-  const stmts = [
+  await env.FORECAST_DB.batch([
     env.FORECAST_DB.prepare(
-      'INSERT INTO forecasts (id, user_id, asset_id, reference_price, created_at) VALUES (?1, ?2, ?3, ?4, ?5)'
-    ).bind(forecastId, user.sub, body.asset_id, referencePrice, now.toISOString()),
-  ];
-
-  for (const h of horizonKeys) {
-    const hData = body.horizons[h];
-    stmts.push(
-      env.FORECAST_DB.prepare(
-        `INSERT INTO forecast_horizons (id, forecast_id, horizon, target_date, p10, p25, p50, p75, p90, justification)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`
-      ).bind(
-        crypto.randomUUID(), forecastId, h, targetDateForHorizon(h, now),
-        hData.p10, hData.p25, hData.p50, hData.p75, hData.p90,
-        hData.justification || null
-      )
-    );
-  }
-
-  await env.FORECAST_DB.batch(stmts);
+      `INSERT INTO forecasts (id, user_id, asset_id, reference_price, horizon_days, created_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6)`
+    ).bind(forecastId, user.sub, body.asset_id, referencePrice, body.horizon_days, now),
+    env.FORECAST_DB.prepare(
+      `INSERT INTO forecast_grids (forecast_id, n_t, n_p, price_min, price_max, grid, compression, justification)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'none', ?7)`
+    ).bind(
+      forecastId,
+      body.n_t, body.n_p,
+      body.price_min, body.price_max,
+      gridBytes,
+      body.justification?.trim() || null
+    ),
+  ]);
 
   return jsonResponse({ id: forecastId, reference_price: referencePrice }, 201);
 };
@@ -110,33 +114,26 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20')));
   const offset = (page - 1) * limit;
 
-  let query = `
-    SELECT f.id, f.asset_id, a.name as asset_name, a.asset_class,
-           f.reference_price, f.created_at,
-           COUNT(CASE WHEN fh.resolved = 1 THEN 1 END) as resolved_count,
-           COUNT(fh.id) as total_horizons
-    FROM forecasts f
-    JOIN assets a ON f.asset_id = a.id
-    LEFT JOIN forecast_horizons fh ON f.id = fh.forecast_id
-  `;
-
-  const bindings: (string | number)[] = [];
-
+  let whereUserId: string;
   if (userId) {
-    query += ' WHERE f.user_id = ?1';
-    bindings.push(userId);
+    whereUserId = userId;
   } else {
     const user = await getUser(request, env.JWT_SECRET);
     if (!user) return errorResponse('Provide user_id or authenticate', 400);
-    query += ' WHERE f.user_id = ?1';
-    bindings.push(user.sub);
+    whereUserId = user.sub;
   }
 
-  query += ' GROUP BY f.id ORDER BY f.created_at DESC LIMIT ?2 OFFSET ?3';
-  bindings.push(limit, offset);
-
-  const stmt = env.FORECAST_DB.prepare(query).bind(...bindings);
-  const { results } = await stmt.all();
+  const { results } = await env.FORECAST_DB.prepare(`
+    SELECT f.id, f.asset_id, a.name as asset_name, a.asset_class,
+           f.reference_price, f.horizon_days, f.created_at,
+           fg.price_min, fg.price_max, fg.n_t, fg.n_p
+    FROM forecasts f
+    JOIN assets a ON f.asset_id = a.id
+    LEFT JOIN forecast_grids fg ON f.id = fg.forecast_id
+    WHERE f.user_id = ?1
+    ORDER BY f.created_at DESC
+    LIMIT ?2 OFFSET ?3
+  `).bind(whereUserId, limit, offset).all();
 
   return jsonResponse({ forecasts: results, page, limit });
 };

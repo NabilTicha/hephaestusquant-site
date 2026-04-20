@@ -991,6 +991,35 @@ input[type="number"].form-input::-webkit-outer-spin-button {
 
 /* ---- Forecast painter ---- */
 
+.painter-horizon {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 900px;
+  margin-bottom: var(--space-md);
+}
+
+.painter-horizon .form-input {
+  width: auto;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.88rem;
+}
+
+.painter-horizon #horizon-value {
+  width: 90px;
+}
+
+.painter-horizon #horizon-unit {
+  min-width: 120px;
+  background: var(--surface);
+}
+
+.horizon-summary {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
 .painter-controls {
   display: flex;
   flex-wrap: wrap;

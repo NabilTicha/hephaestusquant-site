@@ -65,8 +65,27 @@
       <div id="painter-form" style="display:none;">
         <div class="section-header" style="margin-top: var(--space-xl);">
           <span class="label">Step 2</span>
+          <h2>Pick a horizon</h2>
+          <p>How far ahead do you want to forecast? The canvas will span from now to the end of that horizon.</p>
+        </div>
+
+        <div class="painter-horizon">
+          <label>
+            <input type="number" id="horizon-value" class="form-input" min="1" step="1" value="1" />
+          </label>
+          <select id="horizon-unit" class="form-input">
+            <option value="days">days</option>
+            <option value="weeks">weeks</option>
+            <option value="months">months</option>
+            <option value="years" selected>years</option>
+          </select>
+          <span id="horizon-summary" class="horizon-summary"></span>
+        </div>
+
+        <div class="section-header" style="margin-top: var(--space-lg);">
+          <span class="label">Step 3</span>
           <h2>Paint your price distribution</h2>
-          <p>Brush where you think the price will be across the next year. Darker = more probable. Every weekly column should have some paint before you can submit.</p>
+          <p>Brush where you think the price will be across your chosen horizon. Darker = more probable. Every time column must have some paint before you can submit.</p>
         </div>
 
         <div class="painter-controls">
@@ -118,7 +137,7 @@
         </div>
 
         <div class="painter-status">
-          <span id="coverage-text">Coverage: 0 / 52 weeks painted</span>
+          <span id="coverage-text">Coverage: 0 / 64 columns painted</span>
         </div>
 
         <textarea class="form-input" id="painter-justification" placeholder="Justification (optional)..." rows="3" style="margin-top: var(--space-md); max-width: 900px;"></textarea>
