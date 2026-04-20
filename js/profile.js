@@ -22,19 +22,70 @@
   loadProfile(userId);
 
   async function loadProfile(id) {
+    const tag = '[profile-diag]';
+    const diag = { phase: 'start', id };
     try {
-      const res = await fetch(`/api/users/${id}`);
+      diag.cookieLen = document.cookie.length;
+      diag.hasHqToken = /(?:^|;\s*)hq_token=/.test(document.cookie);
+      diag.authReady = !!(window.Auth && Auth.getUser);
+      diag.authUser = (window.Auth && Auth.getUser()) || null;
+      diag.ua = navigator.userAgent;
+      console.log(tag, 'request', diag);
+
+      const res = await fetch(`/api/users/${id}`, { credentials: 'same-origin' });
+      const headers = {};
+      res.headers.forEach((v, k) => { headers[k] = v; });
+      const rawText = await res.text();
+
+      const respDiag = {
+        phase: 'response',
+        status: res.status,
+        ok: res.ok,
+        headers,
+        rawLen: rawText.length,
+        rawHead: rawText.slice(0, 300),
+      };
+      console.log(tag, 'response', respDiag);
+
       if (!res.ok) {
-        document.getElementById('profile-hero').innerHTML = '<div class="empty-state"><p>User not found.</p></div>';
+        document.getElementById('profile-hero').innerHTML =
+          `<div class="empty-state"><p>Server returned ${res.status}.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${escapeHtml(rawText.slice(0, 1000))}</pre></div>`;
         return;
       }
-      const data = await res.json();
-      renderProfile(data);
+
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (parseErr) {
+        throw new Error('JSON parse failed: ' + parseErr.message + ' | head=' + rawText.slice(0, 200));
+      }
+
+      const shapeDiag = {
+        phase: 'parsed',
+        topKeys: Object.keys(data || {}),
+        types: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v === null ? 'null' : Array.isArray(v) ? `array[${v.length}]` : typeof v])) : null,
+        user: data && data.user,
+        forecast_count: data && data.forecast_count,
+        avg_score: data && data.avg_score,
+        avg_score_type: data && typeof data.avg_score,
+        first_forecast: data && data.forecasts && data.forecasts[0],
+      };
+      console.log(tag, 'parsed', shapeDiag);
+
+      renderProfile(data, tag);
+      console.log(tag, 'render complete');
     } catch (e) {
-      console.error('[profile] load/render failed', e);
+      console.error(tag, 'load/render failed', e, 'state=', diag);
       document.getElementById('profile-hero').innerHTML =
-        `<div class="empty-state"><p>Failed to load profile.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${(e && e.stack) || e}</pre></div>`;
+        `<div class="empty-state"><p>Failed to load profile.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${escapeHtml((e && e.stack) || String(e))}</pre></div>`;
     }
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   function fmtHorizon(days) {
@@ -64,12 +115,24 @@
     return isFinite(n) ? n.toFixed(digits) : '—';
   }
 
-  function renderProfile(data) {
+  function renderProfile(data, tag = '[profile-diag]') {
+    const step = (name, v) => console.log(tag, 'render:' + name, v);
+    step('enter', { hasData: !!data });
     const user = data.user || {};
     const forecast_count = data.forecast_count || 0;
     const avg_score = data.avg_score;
     const forecasts = data.forecasts || [];
+    step('fields', {
+      user_created_at: user.created_at,
+      user_name: user.name,
+      user_picture_url: user.picture_url,
+      forecast_count,
+      avg_score,
+      avg_score_type: typeof avg_score,
+      forecasts_len: forecasts.length,
+    });
     const created = fmtDate(user.created_at, { month: 'long', year: 'numeric' });
+    step('created', created);
 
     document.getElementById('profile-hero').innerHTML = `
       <div class="profile-header">
@@ -81,6 +144,7 @@
       </div>
     `;
 
+    step('hero-set', true);
     if (forecast_count > 0) {
       document.getElementById('scores-section').style.display = '';
       const cards = document.getElementById('score-cards');
@@ -94,10 +158,12 @@
           <span class="score-label">Forecasts</span>
         </div>
       `;
+      step('scores-set', true);
     }
 
     document.getElementById('forecasts-section').style.display = '';
     const list = document.getElementById('forecast-list');
+    step('forecasts-section-shown', true);
     if (forecasts.length === 0) {
       list.innerHTML = `
         <div class="empty-state">
@@ -107,7 +173,8 @@
       return;
     }
 
-    list.innerHTML = forecasts.map(f => {
+    list.innerHTML = forecasts.map((f, i) => {
+      step('forecast:' + i, { id: f && f.id, asset: f && f.asset_id, score: f && f.score, score_type: typeof (f && f.score), horizon: f && f.horizon_days, created_at: f && f.created_at });
       const date = fmtDate(f.created_at, { month: 'short', day: 'numeric', year: 'numeric' });
       const horizon = fmtHorizon(f.horizon_days);
       const score = fmtScore(f.score, 3);
