@@ -31,7 +31,9 @@
       const data = await res.json();
       renderProfile(data);
     } catch (e) {
-      document.getElementById('profile-hero').innerHTML = '<div class="empty-state"><p>Failed to load profile.</p></div>';
+      console.error('[profile] load/render failed', e);
+      document.getElementById('profile-hero').innerHTML =
+        `<div class="empty-state"><p>Failed to load profile.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${(e && e.stack) || e}</pre></div>`;
     }
   }
 
