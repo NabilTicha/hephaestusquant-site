@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leaderboard · Hephaestus Quant</title>
-  <meta name="description" content="Forecasting leaderboard. Ranked by CRPS, calibration, sharpness, and more." />
+  <title>Forecast · Hephaestus Quant</title>
+  <meta name="description" content="View a painted probability forecast with the realised price path overlaid." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -21,7 +21,7 @@
       <nav>
         <a href="/kernel.html">Kernel</a>
         <a href="/doctrine.html">Doctrine</a>
-        <a href="/leaderboard.html" class="active">Leaderboard</a>
+        <a href="/leaderboard.html">Leaderboard</a>
         <a href="/forecast.html">Forecast</a>
         <a href="/about.html">About</a>
         <a href="/apply.html">Apply</a>
@@ -32,25 +32,25 @@
 
   <main class="container">
 
-    <section class="hero">
-      <span class="label">Forecasting</span>
-      <h1>Leaderboard</h1>
-      <p class="subtitle">
-        Ranked by average placeholder score (higher is better). Real
-        distributional scoring on painted grids is in the works.
-      </p>
+    <section class="hero" id="forecast-hero">
+      <div class="loading">Loading forecast...</div>
     </section>
 
-    <section>
-      <div id="leaderboard-content">
-        <div class="loading">Loading leaderboard...</div>
+    <section id="forecast-body" style="display:none;">
+      <div class="painter-canvas-wrap">
+        <canvas id="forecast-view-canvas"></canvas>
+        <div id="forecast-view-readout" class="painter-readout"></div>
       </div>
-    </section>
-
-    <section class="cta-block">
-      <h2>Join the leaderboard</h2>
-      <p>Forecast price distributions for any asset in our universe and get scored automatically.</p>
-      <a href="/forecast.html" class="btn btn-primary">Submit a forecast</a>
+      <div class="painter-status" style="margin-top: var(--space-md);">
+        <span id="forecast-view-legend">
+          <span class="legend-swatch" style="background: rgba(184, 156, 75, 0.85);"></span> Painted density
+          &nbsp;&nbsp;
+          <span class="legend-swatch" style="background: #5ec8ff; border-radius: 50%;"></span> Realised price
+          &nbsp;&nbsp;
+          <span class="legend-swatch" style="background: rgba(255,255,255,0.5); border-radius: 50%; width: 4px; height: 4px;"></span> Reference (submission-time spot)
+        </span>
+      </div>
+      <div id="forecast-justification" class="forecast-justification" style="display:none;"></div>
     </section>
 
   </main>
@@ -63,7 +63,7 @@
   </footer>
 
   <script src="/js/auth.js"></script>
-  <script src="/js/leaderboard.js"></script>
+  <script src="/js/forecast-view.js"></script>
 
 </body>
 </html>

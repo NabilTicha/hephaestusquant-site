@@ -1,8 +1,5 @@
 -- Hephaestus Quant Forecasting Platform Schema
 
-DROP TABLE IF EXISTS leaderboard_cache;
-DROP TABLE IF EXISTS forecast_scores;
-DROP TABLE IF EXISTS forecast_horizons;
 DROP TABLE IF EXISTS forecast_grids;
 DROP TABLE IF EXISTS forecasts;
 DROP TABLE IF EXISTS price_snapshots;
@@ -39,6 +36,9 @@ CREATE TABLE forecasts (
   asset_id TEXT NOT NULL REFERENCES assets(id),
   reference_price REAL NOT NULL,
   horizon_days INTEGER,
+  -- Placeholder score. Will be replaced by a real distributional score
+  -- (CRPS / log-loss over the grid) once scoring v2 lands.
+  score REAL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -57,51 +57,10 @@ CREATE TABLE forecast_grids (
   justification TEXT
 );
 
-CREATE TABLE forecast_horizons (
-  id TEXT PRIMARY KEY,
-  forecast_id TEXT NOT NULL REFERENCES forecasts(id) ON DELETE CASCADE,
-  horizon TEXT NOT NULL CHECK (horizon IN ('1w', '1m', '3m', '1y')),
-  target_date TEXT NOT NULL,
-  p10 REAL NOT NULL,
-  p25 REAL NOT NULL,
-  p50 REAL NOT NULL,
-  p75 REAL NOT NULL,
-  p90 REAL NOT NULL,
-  justification TEXT,
-  resolved INTEGER NOT NULL DEFAULT 0,
-  actual_price REAL,
-  resolved_at TEXT,
-  UNIQUE(forecast_id, horizon)
-);
-
-CREATE TABLE forecast_scores (
-  id TEXT PRIMARY KEY,
-  horizon_id TEXT NOT NULL UNIQUE REFERENCES forecast_horizons(id),
-  crps REAL NOT NULL,
-  calibration_hit_50 INTEGER NOT NULL,
-  calibration_hit_80 INTEGER NOT NULL,
-  interval_width_50 REAL NOT NULL,
-  interval_width_80 REAL NOT NULL,
-  median_error_pct REAL NOT NULL,
-  directional_hit INTEGER NOT NULL
-);
-
-CREATE TABLE leaderboard_cache (
-  user_id TEXT NOT NULL REFERENCES users(id),
-  horizon TEXT NOT NULL,
-  metric TEXT NOT NULL,
-  score REAL NOT NULL,
-  forecast_count INTEGER NOT NULL,
-  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  PRIMARY KEY (user_id, horizon, metric)
-);
-
 CREATE INDEX idx_forecasts_user ON forecasts(user_id);
 CREATE INDEX idx_forecasts_asset ON forecasts(asset_id);
-CREATE INDEX idx_forecast_horizons_forecast ON forecast_horizons(forecast_id);
-CREATE INDEX idx_forecast_horizons_target ON forecast_horizons(target_date, resolved);
+CREATE INDEX idx_forecasts_score ON forecasts(score);
 CREATE INDEX idx_price_snapshots_date ON price_snapshots(date);
-CREATE INDEX idx_leaderboard_horizon_metric ON leaderboard_cache(horizon, metric);
 
 -- Seed: US Equities
 INSERT INTO assets (id, name, asset_class) VALUES

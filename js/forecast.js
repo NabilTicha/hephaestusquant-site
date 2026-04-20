@@ -745,7 +745,7 @@ const ForecastForm = (() => {
           `Horizon: ${horizonDays} days. Will be scored as time passes.`;
       }
       const link = document.getElementById('view-forecast-link');
-      if (link && Auth.getUser()) link.href = `/profile.html?id=${Auth.getUser().id}`;
+      if (link && data && data.id) link.href = `/forecast-view.html?id=${data.id}`;
     } catch (e) {
       showErrors(['Network error. Please try again.']);
       btn.disabled = false;

@@ -86,12 +86,15 @@ export const onRequestPost: CFPagesFunction = async ({ request, env }) => {
 
   const forecastId = crypto.randomUUID();
   const now = new Date().toISOString();
+  // Placeholder score: uniform random in [0, 1). Replaced when scoring v2
+  // (grid-based CRPS / log-loss) is implemented.
+  const placeholderScore = Math.random();
 
   await env.FORECAST_DB.batch([
     env.FORECAST_DB.prepare(
-      `INSERT INTO forecasts (id, user_id, asset_id, reference_price, horizon_days, created_at)
-       VALUES (?1, ?2, ?3, ?4, ?5, ?6)`
-    ).bind(forecastId, user.sub, body.asset_id, referencePrice, body.horizon_days, now),
+      `INSERT INTO forecasts (id, user_id, asset_id, reference_price, horizon_days, score, created_at)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`
+    ).bind(forecastId, user.sub, body.asset_id, referencePrice, body.horizon_days, placeholderScore, now),
     env.FORECAST_DB.prepare(
       `INSERT INTO forecast_grids (forecast_id, n_t, n_p, price_min, price_max, grid, compression, justification)
        VALUES (?1, ?2, ?3, ?4, ?5, ?6, 'none', ?7)`
@@ -104,7 +107,11 @@ export const onRequestPost: CFPagesFunction = async ({ request, env }) => {
     ),
   ]);
 
-  return jsonResponse({ id: forecastId, reference_price: referencePrice }, 201);
+  return jsonResponse({
+    id: forecastId,
+    reference_price: referencePrice,
+    score: placeholderScore,
+  }, 201);
 };
 
 export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
@@ -125,7 +132,7 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
 
   const { results } = await env.FORECAST_DB.prepare(`
     SELECT f.id, f.asset_id, a.name as asset_name, a.asset_class,
-           f.reference_price, f.horizon_days, f.created_at,
+           f.reference_price, f.horizon_days, f.score, f.created_at,
            fg.price_min, fg.price_max, fg.n_t, fg.n_p
     FROM forecasts f
     JOIN assets a ON f.asset_id = a.id

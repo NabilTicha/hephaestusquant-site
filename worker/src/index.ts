@@ -17,16 +17,6 @@ export default {
       console.error('Price fetch failed:', e);
     }
 
-    // Step 2: Resolve matured forecasts and rebuild leaderboard
-    try {
-      const resolveRes = await fetch(`${env.API_BASE_URL}/api/internal/resolve`, {
-        method: 'POST',
-        headers,
-      });
-      const resolveData = await resolveRes.json() as { message: string };
-      console.log('Resolution:', resolveData.message);
-    } catch (e) {
-      console.error('Resolution failed:', e);
-    }
+    // Scoring v2 (grid-based) not yet implemented; resolution step removed.
   },
 };

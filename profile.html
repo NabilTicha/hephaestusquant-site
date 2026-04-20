@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -41,19 +40,13 @@
       <div class="section-header">
         <span class="label">Performance</span>
         <h2>Aggregate scores</h2>
+        <p style="font-size: 0.78rem; color: var(--muted); font-family: var(--font-mono);">
+          Placeholder score (uniform random in [0, 1)). Will be replaced by a
+          real distributional scoring rule applied to your painted grid vs.
+          the realised price trajectory.
+        </p>
       </div>
       <div class="score-cards" id="score-cards"></div>
-    </section>
-
-    <section id="calibration-section" style="display:none;">
-      <div class="section-header">
-        <span class="label">Calibration</span>
-        <h2>Interval coverage</h2>
-        <p>How often actual prices fell within your predicted intervals.</p>
-      </div>
-      <div class="chart-container" style="height: 240px;">
-        <canvas id="cal-chart"></canvas>
-      </div>
     </section>
 
     <section id="forecasts-section" style="display:none;">
