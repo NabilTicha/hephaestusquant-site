@@ -153,14 +153,6 @@ const ForecastForm = (() => {
 
     // Reset state
     density = new Float32Array(N_T * N_P);
-    // TEST BLOB: big circle in the centre of the grid to confirm JS is live
-    for (let ti = 0; ti < N_T; ti++) {
-      for (let pi = 0; pi < N_P; pi++) {
-        const dx = (ti - N_T / 2) / (N_T / 4);
-        const dy = (pi - N_P / 2) / (N_P / 4);
-        density[ti * N_P + pi] = Math.exp(-(dx * dx + dy * dy));
-      }
-    }
     history.length = 0;
     redoStack.length = 0;
     viewMode = 'raw';
@@ -171,6 +163,7 @@ const ForecastForm = (() => {
     setHorizonInputs(horizonDays);
     updateHorizonSummary();
     setDefaultPriceRange();
+    fillGBM();
 
     if (!painterBound) {
       setupPainterControls();
