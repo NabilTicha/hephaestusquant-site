@@ -266,6 +266,8 @@ const ForecastForm = (() => {
       dirtyRender = true;
     };
 
+    document.querySelector('[data-action="fill-gbm"]').onclick = fillGBM;
+
     document.getElementById('brush-radius').oninput = e => { brushRadius = parseFloat(e.target.value); };
     document.getElementById('brush-opacity').oninput = e => { brushStrength = parseFloat(e.target.value); };
 
@@ -408,6 +410,34 @@ const ForecastForm = (() => {
         }
       }
     }
+  }
+
+  // Fill the grid with a log-normal (GBM) prior: zero-drift gaussian in
+  // log-return space, width σ√t, widening left→right as t grows.
+  function fillGBM() {
+    const annualVol = parseFloat(document.getElementById('gbm-vol').value) / 100;
+    if (!isFinite(annualVol) || annualVol <= 0) return;
+
+    const center = (spot > 0) ? spot : (priceMin + priceMax) / 2;
+    pushHistory();
+    redoStack.length = 0;
+
+    for (let ti = 0; ti < N_T; ti++) {
+      // Clamp to at least 1 day so the first column isn't a delta function.
+      const tYears = Math.max(((ti + 0.5) / N_T) * horizonDays / 365, 1 / 365);
+      const sigmaT = annualVol * Math.sqrt(tYears);
+      const inv2s2 = 1 / (2 * sigmaT * sigmaT);
+
+      for (let pi = 0; pi < N_P; pi++) {
+        const price = priceMin + (pi + 0.5) / N_P * (priceMax - priceMin);
+        if (price <= 0) { density[ti * N_P + pi] = 0; continue; }
+        const logR = Math.log(price / center);
+        density[ti * N_P + pi] = Math.exp(-logR * logR * inv2s2);
+      }
+    }
+
+    dirtyRender = true;
+    updateCoverage();
   }
 
   // ---- History ----

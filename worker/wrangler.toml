@@ -9,5 +9,5 @@ crons = [
 ]
 
 [vars]
-API_BASE_URL = ""
+API_BASE_URL = "https://hephaestusquant.org/"
 INTERNAL_API_SECRET = ""
