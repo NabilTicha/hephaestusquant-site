@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>80-in-8 · Hephaestus Quant</title>
+  <meta name="description" content="The Optiver 80-in-8 mental math drill. 80 questions, 8 minutes, +1 correct, -2 wrong or skipped." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <div class="nav-dropdown active">
+          <span class="nav-dropdown-trigger">Drills</span>
+          <div class="nav-dropdown-menu">
+            <a href="/forecast.html">Forecast</a>
+            <a href="/80-in-8.html" class="active">80-in-8</a>
+          </div>
+        </div>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section id="intro-section">
+      <div class="hero">
+        <span class="label">Mental Math · Optiver-style</span>
+        <h1>80-in-8</h1>
+        <p class="subtitle">
+          Eighty arithmetic questions. Eight minutes. No calculator, no scratch paper.
+          Modeled on the Optiver trader-candidate assessment.
+        </p>
+      </div>
+
+      <div class="section-header">
+        <span class="label">Rules</span>
+        <h2>How it works</h2>
+      </div>
+
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">Format</span>
+          <span class="item-text">80 questions, multiple choice with 4 options. One question on screen at a time.</span>
+        </li>
+        <li>
+          <span class="item-tag">Time</span>
+          <span class="item-text">8 minutes total — about 6 seconds per question.</span>
+        </li>
+        <li>
+          <span class="item-tag">Scoring</span>
+          <span class="item-text">+1 for a correct answer. <strong>-2</strong> for a wrong answer or a skipped question. Negative scores are possible.</span>
+        </li>
+        <li>
+          <span class="item-tag">Content</span>
+          <span class="item-text">Whole numbers, decimals (up to 2dp), fractions, fraction-decimal conversions, and simple algebra. Mental arithmetic only.</span>
+        </li>
+        <li>
+          <span class="item-tag">Pass</span>
+          <span class="item-text">A net score of 56 is the rough Optiver pass threshold. 70+ is competitive.</span>
+        </li>
+      </ul>
+
+      <div class="cta-block">
+        <button id="start-btn" class="btn btn-primary">Start drill</button>
+      </div>
+    </section>
+
+    <section id="test-section" style="display:none;">
+      <div class="eighty-status">
+        <div class="eighty-status-item">
+          <span class="label">Time</span>
+          <span id="timer" class="eighty-status-value">08:00</span>
+        </div>
+        <div class="eighty-status-item">
+          <span class="label">Question</span>
+          <span id="counter" class="eighty-status-value">1 / 80</span>
+        </div>
+        <div class="eighty-status-item">
+          <span class="label">Score</span>
+          <span id="live-score" class="eighty-status-value">0</span>
+        </div>
+      </div>
+
+      <div class="eighty-question-card">
+        <div id="question" class="eighty-question"></div>
+        <div id="choices" class="eighty-choices"></div>
+        <div class="eighty-actions">
+          <button id="skip-btn" class="btn btn-sm">Skip (-2)</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="results-section" style="display:none;">
+      <div class="hero">
+        <span class="label">Drill complete</span>
+        <h1 id="results-title">Score: 0</h1>
+        <p id="results-verdict" class="subtitle"></p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <span class="label">Correct</span>
+          <h3 id="results-correct">0</h3>
+          <p>Each worth +1.</p>
+        </div>
+        <div class="card">
+          <span class="label">Wrong</span>
+          <h3 id="results-wrong">0</h3>
+          <p>Each costs 2 points.</p>
+        </div>
+        <div class="card">
+          <span class="label">Skipped</span>
+          <h3 id="results-skipped">0</h3>
+          <p>Each costs 2 points.</p>
+        </div>
+      </div>
+
+      <div class="cta-block">
+        <button id="restart-btn" class="btn btn-primary">Take it again</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>2025</span>
+    </div>
+  </footer>
+
+  <script src="/js/80-in-8.js?v=1"></script>
+
+</body>
+</html>

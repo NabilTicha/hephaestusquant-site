@@ -208,6 +208,71 @@ nav a.active {
   color: var(--text-heading);
 }
 
+/* Drills dropdown */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-trigger {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.nav-dropdown:hover .nav-dropdown-trigger,
+.nav-dropdown.active .nav-dropdown-trigger {
+  color: var(--text-heading);
+}
+
+/* Hover hit-buffer so the menu doesn't close while crossing the gap */
+.nav-dropdown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -0.5rem;
+  right: -0.5rem;
+  height: 0.7rem;
+}
+
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 150px;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.3rem 0;
+  background: rgba(11, 13, 16, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 200;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu {
+  display: flex;
+}
+
+.nav-dropdown-menu a {
+  padding: 0.55rem 1rem;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.nav-dropdown-menu a:hover,
+.nav-dropdown-menu a.active {
+  color: var(--text-heading);
+  background: rgba(184, 156, 75, 0.06);
+}
+
 /* Mobile menu */
 .menu-toggle {
   display: none;
@@ -706,6 +771,30 @@ code {
   nav.open a {
     padding: 0.6rem 0;
     font-size: 0.88rem;
+  }
+
+  nav.open .nav-dropdown {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  nav.open .nav-dropdown-trigger {
+    padding: 0.6rem 0;
+    font-size: 0.88rem;
+    color: var(--text-heading);
+  }
+  nav.open .nav-dropdown-menu {
+    display: flex;
+    position: static;
+    transform: none;
+    background: transparent;
+    border: none;
+    padding: 0 0 0 1rem;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  nav.open .nav-dropdown::after {
+    display: none;
   }
 
   .menu-toggle {
@@ -1506,3 +1595,110 @@ input[type="number"].form-input::-webkit-outer-spin-button {
     gap: 0.3rem;
   }
 }
+
+/* ================================================
+   80-in-8 drill
+   ================================================ */
+
+.eighty-status {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.eighty-status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  text-align: center;
+}
+
+.eighty-status-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--text-heading);
+  font-variant-numeric: tabular-nums;
+}
+
+.eighty-question-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.eighty-question {
+  font-family: var(--font-mono);
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  color: var(--text-heading);
+  text-align: center;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-md) 0;
+  word-break: break-word;
+}
+
+.eighty-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 520px;
+}
+
+.eighty-choice {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  padding: 0.9rem 0.8rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.12s;
+  font-variant-numeric: tabular-nums;
+}
+
+.eighty-choice:hover {
+  border-color: var(--accent);
+  color: var(--text-heading);
+  background: rgba(184, 156, 75, 0.06);
+}
+
+.eighty-choice:active {
+  background: rgba(184, 156, 75, 0.12);
+}
+
+.eighty-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 600px) {
+  .eighty-choices {
+    grid-template-columns: 1fr;
+  }
+  .eighty-status {
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+  }
+  .eighty-status-value {
+    font-size: 1.1rem;
+  }
+}
+
