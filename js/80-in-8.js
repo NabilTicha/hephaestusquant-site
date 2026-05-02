@@ -1,6 +1,7 @@
 // 80-in-8: Optiver-style mental-math drill.
 // 80 multiple-choice arithmetic questions in 8 minutes.
 // Scoring: +1 correct, -2 wrong or skipped.
+// Integrated: auth gate, score submission, post-test review table.
 
 (() => {
   const TOTAL_QUESTIONS = 80;
@@ -15,6 +16,7 @@
   let startedAt = 0;
   let timerHandle = null;
   let testActive = false;
+  let answerLog = []; // { q, a, chosen, result: 'correct'|'wrong'|'skipped' }
 
   // ---- Utility ----
   const randInt = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
@@ -29,7 +31,6 @@
     return a;
   };
 
-  // Format a number for display: trim trailing zeros from decimals.
   function fmt(n) {
     if (typeof n === 'string') return n;
     if (Number.isInteger(n)) return String(n);
@@ -42,8 +43,7 @@
     const candidates = [
       ans + 1, ans - 1, ans + 2, ans - 2,
       ans + 10, ans - 10, ans * 2, Math.floor(ans / 2),
-      ans + (ans >= 10 ? 10 : 1),
-      -ans,
+      ans + (ans >= 10 ? 10 : 1), -ans,
     ];
     const out = [];
     for (const c of shuffle(candidates)) {
@@ -88,8 +88,7 @@
     const candidates = [
       `${num + 1}/${den}`, `${Math.max(1, num - 1)}/${den}`,
       `${num}/${den + 1}`, `${num}/${Math.max(2, den - 1)}`,
-      `${den}/${num}`,
-      `${num + 1}/${den + 1}`,
+      `${den}/${num}`, `${num + 1}/${den + 1}`,
     ];
     const out = [];
     for (const c of shuffle(candidates)) {
@@ -106,24 +105,19 @@
   }
 
   // ---- Question generators ----
-  // Each returns: { q: HTML string, a: correct-as-string, choices: [4 strings] }
   function makeQuestion(q, ans, distractors) {
     const all = shuffle([ans, ...distractors]);
     return { q, a: ans, choices: all };
   }
 
   function genIntAdd() {
-    const a = randInt(20, 99);
-    const b = randInt(20, 99);
-    const ans = a + b;
-    return makeQuestion(`${a} + ${b}`, fmt(ans), intDistractors(ans));
+    const a = randInt(20, 99), b = randInt(20, 99);
+    return makeQuestion(`${a} + ${b}`, fmt(a + b), intDistractors(a + b));
   }
 
   function genIntSub() {
-    const a = randInt(50, 199);
-    const b = randInt(20, a - 5);
-    const ans = a - b;
-    return makeQuestion(`${a} − ${b}`, fmt(ans), intDistractors(ans));
+    const a = randInt(50, 199), b = randInt(20, a - 5);
+    return makeQuestion(`${a} − ${b}`, fmt(a - b), intDistractors(a - b));
   }
 
   function genIntMul() {
@@ -134,34 +128,19 @@
       () => [randInt(20, 25), randInt(2, 9)],
     ];
     const [a, b] = pick(variants)();
-    const ans = a * b;
-    return makeQuestion(`${a} × ${b}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${a} × ${b}`, fmt(a * b), intDistractors(a * b));
   }
 
   function genIntDiv() {
-    const divisor = randInt(2, 15);
-    const quotient = randInt(3, 18);
-    const dividend = divisor * quotient;
-    return makeQuestion(`${dividend} ÷ ${divisor}`, fmt(quotient), intDistractors(quotient));
+    const divisor = randInt(2, 15), quotient = randInt(3, 18);
+    return makeQuestion(`${divisor * quotient} ÷ ${divisor}`, fmt(quotient), intDistractors(quotient));
   }
 
   function genDecMul() {
     const variants = [
-      () => {
-        const a = pick([0.2, 0.4, 0.5, 0.6, 0.8, 0.25, 0.75]);
-        const b = randInt(4, 20);
-        return [a, b, round(a * b, 3)];
-      },
-      () => {
-        const a = pick([0.1, 0.2, 0.3, 0.4, 0.5]);
-        const b = pick([0.04, 0.05, 0.2, 0.3, 0.6]);
-        return [a, b, round(a * b, 4)];
-      },
-      () => {
-        const a = pick([0.01, 0.02, 0.04, 0.05]);
-        const b = pick([0.4, 0.5, 0.8, 0.04, 0.05]);
-        return [a, b, round(a * b, 5)];
-      },
+      () => { const a = pick([0.2,0.4,0.5,0.6,0.8,0.25,0.75]); const b = randInt(4,20); return [a,b,round(a*b,3)]; },
+      () => { const a = pick([0.1,0.2,0.3,0.4,0.5]); const b = pick([0.04,0.05,0.2,0.3,0.6]); return [a,b,round(a*b,4)]; },
+      () => { const a = pick([0.01,0.02,0.04,0.05]); const b = pick([0.4,0.5,0.8,0.04,0.05]); return [a,b,round(a*b,5)]; },
     ];
     const [a, b, ans] = pick(variants)();
     return makeQuestion(`${a} × ${b}`, fmt(ans), decDistractors(ans));
@@ -169,79 +148,54 @@
 
   function genDecDiv() {
     const variants = [
-      () => {
-        const q = pick([2, 4, 5, 8, 10, 12, 15, 20, 25]);
-        const d = pick([0.1, 0.2, 0.25, 0.4, 0.5, 0.8]);
-        return [round(d * q, 3), d, q];
-      },
-      () => {
-        const q = pick([0.5, 1.5, 2.5, 0.25, 0.75]);
-        const d = pick([2, 4, 5, 8, 10]);
-        return [round(d * q, 3), d, q];
-      },
+      () => { const q = pick([2,4,5,8,10,12,15,20,25]); const d = pick([0.1,0.2,0.25,0.4,0.5,0.8]); return [round(d*q,3),d,q]; },
+      () => { const q = pick([0.5,1.5,2.5,0.25,0.75]); const d = pick([2,4,5,8,10]); return [round(d*q,3),d,q]; },
     ];
     const [a, b, ans] = pick(variants)();
     return makeQuestion(`${a} ÷ ${b}`, fmt(ans), decDistractors(ans));
   }
 
   function genFracTimesInt() {
-    const denom = pick([2, 3, 4, 5, 6, 8, 10]);
+    const denom = pick([2,3,4,5,6,8,10]);
     const num = randInt(1, denom - 1);
     const multiplier = randInt(2, 10);
-    const integer = denom * multiplier;
     const ans = num * multiplier;
-    return makeQuestion(`${num}/${denom} × ${integer}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${num}/${denom} × ${denom * multiplier}`, fmt(ans), intDistractors(ans));
   }
 
   function genFracToDec() {
     const choices = [
-      [1, 2, 0.5], [1, 4, 0.25], [3, 4, 0.75], [1, 5, 0.2], [2, 5, 0.4],
-      [3, 5, 0.6], [4, 5, 0.8], [1, 8, 0.125], [3, 8, 0.375], [5, 8, 0.625],
-      [7, 8, 0.875], [1, 10, 0.1], [3, 10, 0.3], [7, 10, 0.7], [9, 10, 0.9],
-      [1, 20, 0.05], [3, 20, 0.15], [7, 20, 0.35], [13, 20, 0.65],
-      [1, 25, 0.04], [3, 25, 0.12], [7, 25, 0.28],
-      [1, 16, 0.0625], [3, 16, 0.1875], [5, 16, 0.3125],
+      [1,2,0.5],[1,4,0.25],[3,4,0.75],[1,5,0.2],[2,5,0.4],[3,5,0.6],[4,5,0.8],
+      [1,8,0.125],[3,8,0.375],[5,8,0.625],[7,8,0.875],[1,10,0.1],[3,10,0.3],
+      [7,10,0.7],[9,10,0.9],[1,20,0.05],[3,20,0.15],[7,20,0.35],[13,20,0.65],
+      [1,25,0.04],[3,25,0.12],[7,25,0.28],[1,16,0.0625],[3,16,0.1875],[5,16,0.3125],
     ];
     const [n, d, v] = pick(choices);
     return makeQuestion(`${n}/${d} as a decimal`, fmt(v), decDistractors(v));
   }
 
   function genFracAdd() {
-    // Pick from common-denominator-friendly pairs.
     const sets = [
-      [[1,4],[1,4],[1,2]], [[1,4],[1,2],[3,4]], [[1,3],[1,6],[1,2]],
-      [[1,4],[1,3],[7,12]], [[2,3],[1,6],[5,6]], [[1,5],[3,10],[1,2]],
-      [[1,8],[1,4],[3,8]], [[3,4],[1,8],[7,8]], [[1,2],[1,5],[7,10]],
-      [[1,2],[1,3],[5,6]], [[2,5],[1,10],[1,2]],
+      [[1,4],[1,4],[1,2]],[[1,4],[1,2],[3,4]],[[1,3],[1,6],[1,2]],
+      [[1,4],[1,3],[7,12]],[[2,3],[1,6],[5,6]],[[1,5],[3,10],[1,2]],
+      [[1,8],[1,4],[3,8]],[[3,4],[1,8],[7,8]],[[1,2],[1,5],[7,10]],
+      [[1,2],[1,3],[5,6]],[[2,5],[1,10],[1,2]],
     ];
-    const [[an, ad], [bn, bd], [rn, rd]] = pick(sets);
-    const q = `${an}/${ad} + ${bn}/${bd}`;
-    const ans = `${rn}/${rd}`;
-    return makeQuestion(q, ans, fracDistractors(rn, rd));
+    const [[an,ad],[bn,bd],[rn,rd]] = pick(sets);
+    return makeQuestion(`${an}/${ad} + ${bn}/${bd}`, `${rn}/${rd}`, fracDistractors(rn, rd));
   }
 
   function genAlgebraMissing() {
-    // ? × N = M  or  N × ? = M
-    const x = randInt(2, 12);
-    const a = randInt(3, 12);
-    const product = x * a;
-    return makeQuestion(`? × ${a} = ${product}`, fmt(x), intDistractors(x));
+    const x = randInt(2, 12), a = randInt(3, 12);
+    return makeQuestion(`? × ${a} = ${x * a}`, fmt(x), intDistractors(x));
   }
 
   function genAlgebraFraction() {
-    // Solve  fraction × ? = fraction
-    // e.g.  5/20 × ? = 1/5  ⇒  ? = 4/5
     const sets = [
-      ['5/20', '1/5', '4/5'],
-      ['1/4', '1/2', '2'],
-      ['2/3', '1/2', '3/4'],
-      ['3/8', '3/4', '2'],
-      ['1/3', '1/6', '1/2'],
-      ['2/5', '1/5', '1/2'],
-      ['3/4', '1/2', '2/3'],
+      ['5/20','1/5','4/5'],['1/4','1/2','2'],['2/3','1/2','3/4'],
+      ['3/8','3/4','2'],['1/3','1/6','1/2'],['2/5','1/5','1/2'],['3/4','1/2','2/3'],
     ];
     const [lhs, rhs, ans] = pick(sets);
-    const q = `${lhs} × ? = ${rhs}`;
     let distractors;
     if (ans.includes('/')) {
       const [n, d] = ans.split('/').map(Number);
@@ -249,18 +203,13 @@
     } else {
       distractors = intDistractors(parseInt(ans, 10));
     }
-    return makeQuestion(q, ans, distractors);
+    return makeQuestion(`${lhs} × ? = ${rhs}`, ans, distractors);
   }
 
-  // Weighted pool reflecting Optiver's reported emphasis on
-  // fractions/decimals/conversions.
   const GENERATORS = [
-    [genIntAdd, 1], [genIntSub, 1],
-    [genIntMul, 2], [genIntDiv, 2],
-    [genDecMul, 2], [genDecDiv, 2],
-    [genFracTimesInt, 2], [genFracToDec, 2],
-    [genFracAdd, 1],
-    [genAlgebraMissing, 1], [genAlgebraFraction, 1],
+    [genIntAdd,1],[genIntSub,1],[genIntMul,2],[genIntDiv,2],
+    [genDecMul,2],[genDecDiv,2],[genFracTimesInt,2],[genFracToDec,2],
+    [genFracAdd,1],[genAlgebraMissing,1],[genAlgebraFraction,1],
   ];
 
   function generateQuestionPool(n) {
@@ -276,15 +225,27 @@
     return pool;
   }
 
+  // ---- Auth gate ----
+  function withAuth(fn) {
+    if (typeof Auth === 'undefined') { fn(); return; }
+    Auth.onReady(user => {
+      if (!user) { Auth.login(); return; }
+      fn();
+    });
+  }
+
   // ---- Test flow ----
   function startTest() {
     questions = generateQuestionPool(TOTAL_QUESTIONS);
     qIdx = 0; correct = 0; wrong = 0; skipped = 0;
+    answerLog = [];
     testActive = true;
     startedAt = Date.now();
 
     document.getElementById('intro-section').style.display = 'none';
     document.getElementById('results-section').style.display = 'none';
+    const oldReview = document.getElementById('review-section');
+    if (oldReview) oldReview.remove();
     document.getElementById('test-section').style.display = '';
 
     renderQuestion();
@@ -295,7 +256,11 @@
   function tick() {
     const elapsed = Date.now() - startedAt;
     const remaining = Math.max(0, TIME_LIMIT_MS - elapsed);
-    document.getElementById('timer').textContent = formatTime(remaining);
+    const timerEl = document.getElementById('timer');
+    if (timerEl) {
+      timerEl.textContent = formatTime(remaining);
+      timerEl.classList.toggle('timer-warning', remaining <= 60_000);
+    }
     if (remaining <= 0) endTest();
   }
 
@@ -316,36 +281,42 @@
     document.getElementById('question').textContent = `${q.q} = ?`;
     const container = document.getElementById('choices');
     container.innerHTML = '';
-    for (const choice of q.choices) {
+    q.choices.forEach((choice, i) => {
       const btn = document.createElement('button');
       btn.className = 'eighty-choice';
-      btn.textContent = choice;
+      // Keyboard hint badge
+      const kbd = document.createElement('span');
+      kbd.className = 'choice-kbd';
+      kbd.textContent = i + 1;
+      btn.appendChild(kbd);
+      btn.appendChild(document.createTextNode(choice));
       btn.addEventListener('click', () => answer(choice));
       container.appendChild(btn);
-    }
+    });
   }
 
   function answer(choice) {
     if (!testActive) return;
     const q = questions[qIdx];
-    if (choice === q.a) correct++; else wrong++;
+    const isCorrect = choice === q.a;
+    if (isCorrect) correct++; else wrong++;
+    answerLog.push({ q: q.q, a: q.a, chosen: choice, result: isCorrect ? 'correct' : 'wrong' });
     advance();
   }
 
   function skip() {
     if (!testActive) return;
+    const q = questions[qIdx];
     skipped++;
+    answerLog.push({ q: q.q, a: q.a, chosen: null, result: 'skipped' });
     advance();
   }
 
   function advance() {
     qIdx++;
     renderStatus();
-    if (qIdx >= TOTAL_QUESTIONS) {
-      endTest();
-    } else {
-      renderQuestion();
-    }
+    if (qIdx >= TOTAL_QUESTIONS) endTest();
+    else renderQuestion();
   }
 
   function endTest() {
@@ -353,13 +324,23 @@
     testActive = false;
     clearInterval(timerHandle);
 
-    // Any unanswered remaining questions count as skipped.
-    const remaining = TOTAL_QUESTIONS - qIdx;
-    if (remaining > 0) skipped += remaining;
+    while (answerLog.length < TOTAL_QUESTIONS) {
+      const q = questions[answerLog.length];
+      skipped++;
+      answerLog.push({ q: q ? q.q : '?', a: q ? q.a : '?', chosen: null, result: 'skipped' });
+    }
 
+    const duration_s = Math.round((Date.now() - startedAt) / 1000);
     const score = correct - 2 * wrong - 2 * skipped;
     const penalty = 2 * (wrong + skipped);
     document.getElementById('test-section').style.display = 'none';
+    showResults(score);
+    buildReviewTable();
+    submitScore({ score, correct, wrong, skipped, duration_s });
+  }
+
+  // ---- Results ----
+  function showResults(score) {
     document.getElementById('results-section').style.display = '';
     document.getElementById('results-title').textContent = `Score: ${score}`;
     document.getElementById('results-formula').textContent =
@@ -369,32 +350,139 @@
     document.getElementById('results-skipped').textContent = String(skipped);
 
     let verdict;
-    if (score >= 70) verdict = 'Competitive — at or above what Optiver looks for.';
-    else if (score >= 56) verdict = 'Pass. Above the rough Optiver threshold.';
-    else if (score >= 30) verdict = 'Below pass. The penalty for wrong answers is steep — consider skipping less and being more selective.';
-    else verdict = 'Net loss territory. Slow down on the questions you do answer; the -2 wrong penalty bites hard.';
+    if (score >= 70)      verdict = '🏆 Outstanding — highly competitive for Optiver.';
+    else if (score >= 56) verdict = '✅ Pass — above the Optiver threshold of 56.';
+    else if (score >= 30) verdict = '📈 Below pass. Avoid guessing — the −2 penalty bites hard.';
+    else                  verdict = '💪 Keep drilling. Speed and accuracy compound quickly.';
     document.getElementById('results-verdict').textContent = verdict;
   }
 
+  // ---- Review table ----
+  function buildReviewTable() {
+    const existing = document.getElementById('review-section');
+    if (existing) existing.remove();
+
+    const section = document.createElement('section');
+    section.id = 'review-section';
+    section.innerHTML = `
+      <div class="section-header">
+        <span class="label">Review</span>
+        <h2>Question breakdown</h2>
+      </div>
+    `;
+
+    const table = document.createElement('table');
+    table.className = 'review-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Question</th>
+          <th>Your answer</th>
+          <th>Correct answer</th>
+          <th></th>
+        </tr>
+      </thead>
+    `;
+
+    const tbody = document.createElement('tbody');
+    answerLog.forEach((entry, i) => {
+      const tr = document.createElement('tr');
+      tr.className = `review-row review-${entry.result}`;
+
+      const yourAnswer = entry.result === 'skipped'
+        ? '<span class="review-skipped-label">Skipped</span>'
+        : entry.chosen;
+
+      const icon = { correct: '✓', wrong: '✗', skipped: '–' }[entry.result];
+
+      tr.innerHTML = `
+        <td class="review-num">${i + 1}</td>
+        <td class="review-q">${entry.q} = ?</td>
+        <td class="review-chosen${entry.result === 'wrong' ? ' review-wrong-ans' : ''}">${yourAnswer}</td>
+        <td class="review-ans">${entry.a}</td>
+        <td class="review-icon review-icon-${entry.result}">${icon}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    section.appendChild(table);
+
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.parentNode.insertBefore(section, resultsSection.nextSibling);
+  }
+
+  // ---- Score submission ----
+  async function submitScore(payload) {
+    const title = document.getElementById('results-title');
+    const savedEl = document.createElement('span');
+    savedEl.id = 'score-save-status';
+    savedEl.className = 'score-save-status';
+    savedEl.textContent = ' · saving…';
+    if (title) title.appendChild(savedEl);
+
+    try {
+      const res = await fetch('/api/drill/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        savedEl.textContent = ' · saved to leaderboard ✓';
+        savedEl.classList.add('save-ok');
+      } else if (res.status === 401) {
+        savedEl.textContent = ' · sign in to save your score';
+        savedEl.classList.add('save-warn');
+      } else {
+        savedEl.textContent = ' · could not save score';
+        savedEl.classList.add('save-error');
+      }
+    } catch {
+      savedEl.textContent = ' · offline — score not saved';
+      savedEl.classList.add('save-error');
+    }
+  }
+
+  // ---- Restart ----
   function restart() {
     document.getElementById('results-section').style.display = 'none';
+    const oldReview = document.getElementById('review-section');
+    if (oldReview) oldReview.remove();
     document.getElementById('intro-section').style.display = '';
   }
 
   // ---- Wire up ----
-  document.getElementById('start-btn').addEventListener('click', startTest);
-  document.getElementById('skip-btn').addEventListener('click', skip);
-  document.getElementById('restart-btn').addEventListener('click', restart);
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('start-btn');
 
-  // Keyboard: 1-4 for choices, S for skip
-  document.addEventListener('keydown', e => {
-    if (!testActive) return;
-    if (e.key >= '1' && e.key <= '4') {
-      const choices = document.querySelectorAll('.eighty-choice');
-      const idx = parseInt(e.key, 10) - 1;
-      if (choices[idx]) choices[idx].click();
-    } else if (e.key === 's' || e.key === 'S') {
-      skip();
+    // Set correct button state once auth is ready
+    if (typeof Auth !== 'undefined') {
+      Auth.onReady(user => {
+        if (!user && startBtn) {
+          startBtn.textContent = 'Sign in to take the drill';
+        }
+      });
     }
+
+    if (startBtn) {
+      startBtn.addEventListener('click', () => withAuth(startTest));
+    }
+
+    document.getElementById('skip-btn').addEventListener('click', skip);
+    document.getElementById('restart-btn').addEventListener('click', restart);
+
+    // Keyboard: 1–4 to answer, S to skip
+    document.addEventListener('keydown', e => {
+      if (!testActive) return;
+      if (e.key >= '1' && e.key <= '4') {
+        const choices = document.querySelectorAll('.eighty-choice');
+        const idx = parseInt(e.key, 10) - 1;
+        if (choices[idx]) choices[idx].click();
+      } else if (e.key === 's' || e.key === 'S') {
+        skip();
+      }
+    });
   });
 })();
