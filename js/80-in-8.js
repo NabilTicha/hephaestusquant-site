@@ -308,7 +308,6 @@
 
   function renderStatus() {
     document.getElementById('counter').textContent = `${Math.min(qIdx + 1, TOTAL_QUESTIONS)} / ${TOTAL_QUESTIONS}`;
-    document.getElementById('live-score').textContent = String(correct - 2 * wrong - 2 * skipped);
   }
 
   function renderQuestion() {
@@ -359,9 +358,12 @@
     if (remaining > 0) skipped += remaining;
 
     const score = correct - 2 * wrong - 2 * skipped;
+    const penalty = 2 * (wrong + skipped);
     document.getElementById('test-section').style.display = 'none';
     document.getElementById('results-section').style.display = '';
     document.getElementById('results-title').textContent = `Score: ${score}`;
+    document.getElementById('results-formula').textContent =
+      `${correct} correct − 2 × ${wrong + skipped} (wrong + skipped) = ${correct} − ${penalty} = ${score}`;
     document.getElementById('results-correct').textContent = String(correct);
     document.getElementById('results-wrong').textContent = String(wrong);
     document.getElementById('results-skipped').textContent = String(skipped);
