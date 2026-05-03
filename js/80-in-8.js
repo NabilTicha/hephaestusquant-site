@@ -341,6 +341,7 @@
 
   // ---- Results ----
   function showResults(score) {
+    const penalty = 2 * (wrong + skipped);
     document.getElementById('results-section').style.display = '';
     document.getElementById('results-title').textContent = `Score: ${score}`;
     document.getElementById('results-formula').textContent =
