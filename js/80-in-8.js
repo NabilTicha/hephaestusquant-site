@@ -38,22 +38,37 @@
   }
 
   // ---- Distractor helpers ----
+  // Distractors should be plausibly close to the answer so they don't
+  // give themselves away. Step size scales with the magnitude of the answer.
   function intDistractors(ans) {
     const set = new Set([ans]);
+    const abs = Math.abs(ans);
+    const step = abs >= 1000 ? 100 : abs >= 100 ? 10 : 1;
+    const swapAdjacentDigits = n => {
+      const s = String(Math.abs(n));
+      if (s.length < 2) return n + step;
+      const i = randInt(0, s.length - 2);
+      const swapped = s.slice(0, i) + s[i + 1] + s[i] + s.slice(i + 2);
+      const v = parseInt(swapped, 10);
+      return n < 0 ? -v : v;
+    };
     const candidates = [
-      ans + 1, ans - 1, ans + 2, ans - 2,
-      ans + 10, ans - 10, ans * 2, Math.floor(ans / 2),
-      ans + (ans >= 10 ? 10 : 1), -ans,
+      ans + step, ans - step, ans + 2 * step, ans - 2 * step,
+      ans + 5 * step, ans - 5 * step,
+      ans + 1, ans - 1, ans + 10, ans - 10,
+      swapAdjacentDigits(ans),
+      ans + (ans >= 0 ? step * 10 : -step * 10),
+      -ans,
     ];
     const out = [];
     for (const c of shuffle(candidates)) {
       if (out.length >= 3) break;
-      if (set.has(c)) continue;
+      if (!Number.isFinite(c) || set.has(c)) continue;
       set.add(c);
       out.push(c);
     }
     while (out.length < 3) {
-      const c = ans + randInt(-15, 15);
+      const c = ans + randInt(-5, 5) * step;
       if (!set.has(c)) { set.add(c); out.push(c); }
     }
     return out.map(fmt);
@@ -61,21 +76,26 @@
 
   function decDistractors(ans) {
     const set = new Set([fmt(ans)]);
+    const abs = Math.abs(ans);
+    const step = abs >= 100 ? 10 : abs >= 10 ? 1 : abs >= 1 ? 0.1 : abs >= 0.1 ? 0.01 : 0.001;
     const candidates = [
+      round(ans + step, 6), round(ans - step, 6),
+      round(ans + 2 * step, 6), round(ans - 2 * step, 6),
       ans * 10, ans / 10, ans * 100, ans / 100,
-      ans + 0.1, ans - 0.1, ans + 1, ans - 1,
-      -ans, ans * 2, ans / 2,
+      round(ans + 0.5, 6), round(ans - 0.5, 6),
+      -ans, round(ans * 2, 6), round(ans / 2, 6),
     ];
     const out = [];
     for (const c of shuffle(candidates)) {
       if (out.length >= 3) break;
+      if (!Number.isFinite(c)) continue;
       const cs = fmt(round(c, 6));
       if (set.has(cs)) continue;
       set.add(cs);
       out.push(cs);
     }
     while (out.length < 3) {
-      const c = round(ans + (Math.random() - 0.5) * Math.max(1, Math.abs(ans)), 4);
+      const c = round(ans + (Math.random() - 0.5) * 4 * step, 6);
       const cs = fmt(c);
       if (!set.has(cs)) { set.add(cs); out.push(cs); }
     }
@@ -89,6 +109,7 @@
       `${num + 1}/${den}`, `${Math.max(1, num - 1)}/${den}`,
       `${num}/${den + 1}`, `${num}/${Math.max(2, den - 1)}`,
       `${den}/${num}`, `${num + 1}/${den + 1}`,
+      `${num + 2}/${den}`, `${num}/${den + 2}`,
     ];
     const out = [];
     for (const c of shuffle(candidates)) {
@@ -105,60 +126,135 @@
   }
 
   // ---- Question generators ----
+  // Calibrated to Optiver test difficulty: 2-3-digit arithmetic, percentages,
+  // squares, order of operations, signed numbers, harder fractions, linear
+  // algebra. Roughly 6 seconds per question.
+
   function makeQuestion(q, ans, distractors) {
     const all = shuffle([ans, ...distractors]);
     return { q, a: ans, choices: all };
   }
 
   function genIntAdd() {
-    const a = randInt(20, 99), b = randInt(20, 99);
+    const variants = [
+      () => [randInt(100, 999), randInt(100, 999)],
+      () => [randInt(1000, 9999), randInt(100, 999)],
+      () => [randInt(50, 99), randInt(50, 99)],
+    ];
+    const [a, b] = pick(variants)();
     return makeQuestion(`${a} + ${b}`, fmt(a + b), intDistractors(a + b));
   }
 
   function genIntSub() {
-    const a = randInt(50, 199), b = randInt(20, a - 5);
+    const variants = [
+      () => { const a = randInt(500, 999), b = randInt(100, a - 50); return [a, b]; },
+      () => { const a = randInt(1000, 9999), b = randInt(200, a - 100); return [a, b]; },
+      () => { const a = randInt(100, 199), b = randInt(20, 99); return [a, b]; },
+    ];
+    const [a, b] = pick(variants)();
     return makeQuestion(`${a} − ${b}`, fmt(a - b), intDistractors(a - b));
   }
 
   function genIntMul() {
     const variants = [
-      () => [randInt(2, 9), randInt(11, 19)],
-      () => [randInt(11, 19), randInt(11, 19)],
-      () => [randInt(2, 9), randInt(2, 9)],
-      () => [randInt(20, 25), randInt(2, 9)],
+      () => [randInt(11, 99), randInt(11, 99)],     // 2-digit × 2-digit
+      () => [randInt(2, 9), randInt(100, 999)],     // 1-digit × 3-digit
+      () => [randInt(11, 25), randInt(11, 25)],     // common harder squares-area
+      () => [randInt(20, 50), randInt(2, 9)],
     ];
     const [a, b] = pick(variants)();
     return makeQuestion(`${a} × ${b}`, fmt(a * b), intDistractors(a * b));
   }
 
   function genIntDiv() {
-    const divisor = randInt(2, 15), quotient = randInt(3, 18);
-    return makeQuestion(`${divisor * quotient} ÷ ${divisor}`, fmt(quotient), intDistractors(quotient));
+    const variants = [
+      () => { const d = pick([11,12,13,14,15,16,17,18,19,21,22,23,24,25]); const q = randInt(11, 60); return [d, q]; },
+      () => { const d = randInt(2, 9); const q = randInt(50, 200); return [d, q]; },
+    ];
+    const [d, q] = pick(variants)();
+    return makeQuestion(`${d * q} ÷ ${d}`, fmt(q), intDistractors(q));
+  }
+
+  function genSquare() {
+    const n = randInt(11, 25);
+    return makeQuestion(`${n}²`, fmt(n * n), intDistractors(n * n));
+  }
+
+  function genPercent() {
+    const variants = [
+      () => {
+        const p = pick([5,10,15,20,25,30,35,40,50,60,75,80]);
+        const n = pick([40,60,80,120,160,200,240,300,400,500,600,800]);
+        return [`${p}% of ${n}`, n * p / 100];
+      },
+      () => {
+        const part = pick([5,12,15,18,20,24,30,35,40,45,60]);
+        const total = part * pick([4,5,8,10]);
+        return [`${part} is what % of ${total}`, part * 100 / total];
+      },
+      () => {
+        const base = pick([80,120,160,200,240,400,500]);
+        const p = pick([10,15,20,25,30,50]);
+        return [`${base} increased by ${p}%`, base * (100 + p) / 100];
+      },
+    ];
+    const [q, ans] = pick(variants)();
+    if (Number.isInteger(ans)) return makeQuestion(q, fmt(ans), intDistractors(ans));
+    return makeQuestion(q, fmt(round(ans, 4)), decDistractors(ans));
+  }
+
+  function genMixedOps() {
+    const variants = [
+      () => { const a = randInt(2, 20), b = randInt(2, 12), c = randInt(2, 12); return [`${a} + ${b} × ${c}`, a + b * c]; },
+      () => { const a = randInt(2, 12), b = randInt(2, 12), c = randInt(2, 20); return [`${a} × ${b} − ${c}`, a * b - c]; },
+      () => { const a = randInt(2, 9), b = randInt(2, 9), c = randInt(2, 9); return [`(${a} + ${b}) × ${c}`, (a + b) * c]; },
+      () => { const a = randInt(2, 9), b = randInt(2, 9), c = randInt(3, 12); return [`${c} × (${a} − ${b})`, c * (a - b)]; },
+      () => { const k = pick([2,3,4,6,8]); const m = randInt(3, 12); const c = randInt(2, 30); return [`${k * m} ÷ ${k} + ${c}`, m + c]; },
+      () => { const a = randInt(3, 9); const b = randInt(2, 12); return [`${a}² − ${b}`, a * a - b]; },
+    ];
+    const [q, ans] = pick(variants)();
+    return makeQuestion(q, fmt(ans), intDistractors(ans));
+  }
+
+  function genNegative() {
+    const variants = [
+      () => { const a = randInt(20, 99), b = randInt(20, 99); return [`-${a} + ${b}`, b - a]; },
+      () => { const a = randInt(20, 99), b = randInt(20, 99); return [`${a} − ${a + b}`, -b]; },
+      () => { const a = randInt(2, 12), b = randInt(2, 12); return [`-${a} × -${b}`, a * b]; },
+      () => { const a = randInt(2, 12), b = randInt(3, 12); return [`-${a} × ${b}`, -a * b]; },
+      () => { const q = randInt(3, 12), d = randInt(2, 9); return [`-${q * d} ÷ ${d}`, -q]; },
+      () => { const a = randInt(20, 80), b = randInt(20, 80); return [`-${a} − ${b}`, -(a + b)]; },
+    ];
+    const [q, ans] = pick(variants)();
+    return makeQuestion(q, fmt(ans), intDistractors(ans));
   }
 
   function genDecMul() {
     const variants = [
-      () => { const a = pick([0.2,0.4,0.5,0.6,0.8,0.25,0.75]); const b = randInt(4,20); return [a,b,round(a*b,3)]; },
-      () => { const a = pick([0.1,0.2,0.3,0.4,0.5]); const b = pick([0.04,0.05,0.2,0.3,0.6]); return [a,b,round(a*b,4)]; },
-      () => { const a = pick([0.01,0.02,0.04,0.05]); const b = pick([0.4,0.5,0.8,0.04,0.05]); return [a,b,round(a*b,5)]; },
+      () => { const a = pick([0.03,0.04,0.05,0.06,0.07,0.08]); const b = pick([20,30,40,50,60,80,120,150,200,250,400]); return [a,b,round(a*b,3)]; },
+      () => { const a = pick([0.25,0.75,1.25,1.5,2.5]); const b = pick([4,8,12,16,20,24,32,40,80]); return [a,b,round(a*b,3)]; },
+      () => { const a = pick([0.1,0.2,0.3,0.4,0.5,0.6,0.8]); const b = pick([0.4,0.5,0.6,0.7,0.8,0.04,0.05,0.06]); return [a,b,round(a*b,4)]; },
+      () => { const a = pick([0.012,0.015,0.025,0.045,0.125]); const b = pick([100,200,400,800,1000]); return [a,b,round(a*b,4)]; },
     ];
     const [a, b, ans] = pick(variants)();
-    return makeQuestion(`${a} × ${b} = ?`, fmt(ans), decDistractors(ans));
+    return makeQuestion(`${a} × ${b}`, fmt(ans), decDistractors(ans));
   }
 
   function genDecDiv() {
     const variants = [
-      () => { const q = pick([2,4,5,8,10,12,15,20,25]); const d = pick([0.1,0.2,0.25,0.4,0.5,0.8]); return [round(d*q,3),d,q]; },
-      () => { const q = pick([0.5,1.5,2.5,0.25,0.75]); const d = pick([2,4,5,8,10]); return [round(d*q,3),d,q]; },
+      () => { const q = randInt(20, 99); const d = pick([0.5,0.25,0.2,0.4,0.05]); return [round(d*q,3),d,q]; },
+      () => { const q = pick([0.5,1.5,2.5,0.25,0.75,1.25,3.5]); const d = randInt(4,15); return [round(d*q,3),d,q]; },
+      () => { const q = pick([20,25,40,50,80,125,200]); const d = pick([0.01,0.02,0.05,0.1]); return [round(d*q,3),d,q]; },
+      () => { const q = randInt(15, 60); const d = pick([1.5,2.5,3.5,4.5]); return [round(d*q,3),d,q]; },
     ];
     const [a, b, ans] = pick(variants)();
-    return makeQuestion(`${a} ÷ ${b} = ?`, fmt(ans), decDistractors(ans));
+    return makeQuestion(`${a} ÷ ${b}`, fmt(ans), decDistractors(ans));
   }
 
   function genFracTimesInt() {
-    const denom = pick([2,3,4,5,6,8,10]);
+    const denom = pick([2,3,4,5,6,7,8,9,10,12]);
     const num = randInt(1, denom - 1);
-    const multiplier = randInt(2, 10);
+    const multiplier = randInt(3, 15);
     const ans = num * multiplier;
     return makeQuestion(`${num}/${denom} × ${denom * multiplier}`, fmt(ans), intDistractors(ans));
   }
@@ -169,6 +265,7 @@
       [1,8,0.125],[3,8,0.375],[5,8,0.625],[7,8,0.875],[1,10,0.1],[3,10,0.3],
       [7,10,0.7],[9,10,0.9],[1,20,0.05],[3,20,0.15],[7,20,0.35],[13,20,0.65],
       [1,25,0.04],[3,25,0.12],[7,25,0.28],[1,16,0.0625],[3,16,0.1875],[5,16,0.3125],
+      [1,40,0.025],[3,40,0.075],[7,40,0.175],[1,50,0.02],[7,50,0.14],
     ];
     const [n, d, v] = pick(choices);
     return makeQuestion(`${n}/${d} as a decimal`, fmt(v), decDistractors(v));
@@ -176,24 +273,48 @@
 
   function genFracAdd() {
     const sets = [
+      // Easy shared / nested denominators
       [[1,4],[1,4],[1,2]],[[1,4],[1,2],[3,4]],[[1,3],[1,6],[1,2]],
       [[1,4],[1,3],[7,12]],[[2,3],[1,6],[5,6]],[[1,5],[3,10],[1,2]],
       [[1,8],[1,4],[3,8]],[[3,4],[1,8],[7,8]],[[1,2],[1,5],[7,10]],
       [[1,2],[1,3],[5,6]],[[2,5],[1,10],[1,2]],
+      // Cross-denominator (LCM)
+      [[2,3],[3,4],[17,12]],[[3,5],[2,7],[31,35]],[[1,6],[2,9],[7,18]],
+      [[3,8],[5,12],[19,24]],[[2,5],[3,8],[31,40]],[[5,9],[1,6],[13,18]],
+      [[3,7],[1,4],[19,28]],[[7,12],[5,18],[31,36]],[[2,7],[3,5],[31,35]],
+      [[1,9],[2,5],[23,45]],[[5,6],[3,8],[29,24]],
     ];
     const [[an,ad],[bn,bd],[rn,rd]] = pick(sets);
     return makeQuestion(`${an}/${ad} + ${bn}/${bd}`, `${rn}/${rd}`, fracDistractors(rn, rd));
   }
 
-  function genAlgebraMissing() {
-    const x = randInt(2, 12), a = randInt(3, 12);
-    return makeQuestion(`? × ${a} = ${x * a}`, fmt(x), intDistractors(x));
+  function genFracSub() {
+    const sets = [
+      [[5,6],[1,4],[7,12]],[[3,4],[1,3],[5,12]],[[5,8],[1,4],[3,8]],
+      [[7,10],[1,5],[1,2]],[[5,6],[1,2],[1,3]],[[3,5],[1,4],[7,20]],
+      [[4,5],[2,3],[2,15]],[[7,8],[1,3],[13,24]],[[5,12],[1,4],[1,6]],
+      [[2,3],[1,4],[5,12]],[[5,8],[1,3],[7,24]],[[7,12],[1,4],[1,3]],
+      [[3,4],[2,5],[7,20]],[[5,9],[1,3],[2,9]],[[7,10],[3,8],[13,40]],
+    ];
+    const [[an,ad],[bn,bd],[rn,rd]] = pick(sets);
+    return makeQuestion(`${an}/${ad} − ${bn}/${bd}`, `${rn}/${rd}`, fracDistractors(rn, rd));
+  }
+
+  function genAlgebraLinear() {
+    const variants = [
+      () => { const a = randInt(2, 12), x = randInt(2, 15), b = randInt(1, 30); return [`${a}x + ${b} = ${a * x + b}, x =`, x]; },
+      () => { const a = randInt(3, 12), x = randInt(2, 15), b = randInt(1, 30); return [`${a}x − ${b} = ${a * x - b}, x =`, x]; },
+      () => { const a = randInt(2, 9), x = randInt(2, 12), b = randInt(2, 9); return [`${a}(x + ${b}) = ${a * (x + b)}, x =`, x]; },
+    ];
+    const [q, ans] = pick(variants)();
+    return makeQuestion(q, fmt(ans), intDistractors(ans));
   }
 
   function genAlgebraFraction() {
     const sets = [
       ['5/20','1/5','4/5'],['1/4','1/2','2'],['2/3','1/2','3/4'],
       ['3/8','3/4','2'],['1/3','1/6','1/2'],['2/5','1/5','1/2'],['3/4','1/2','2/3'],
+      ['2/7','4/7','2'],['3/10','9/20','3/2'],['5/6','5/12','1/2'],
     ];
     const [lhs, rhs, ans] = pick(sets);
     let distractors;
@@ -206,10 +327,15 @@
     return makeQuestion(`${lhs} × ? = ${rhs}`, ans, distractors);
   }
 
+  // Weights tuned so the mix mirrors what the Optiver test actually throws:
+  // mostly multi-digit arithmetic, percentages, fractions, and decimals,
+  // with a steady tail of squares, mixed ops, signed numbers, and algebra.
   const GENERATORS = [
-    [genIntAdd,1],[genIntSub,1],[genIntMul,2],[genIntDiv,2],
-    [genDecMul,2],[genDecDiv,2],[genFracTimesInt,2],[genFracToDec,2],
-    [genFracAdd,1],[genAlgebraMissing,1],[genAlgebraFraction,1],
+    [genIntAdd, 2], [genIntSub, 2], [genIntMul, 3], [genIntDiv, 2],
+    [genDecMul, 3], [genDecDiv, 2],
+    [genFracTimesInt, 2], [genFracToDec, 2], [genFracAdd, 2], [genFracSub, 2],
+    [genPercent, 3], [genSquare, 2], [genMixedOps, 2], [genNegative, 2],
+    [genAlgebraLinear, 2], [genAlgebraFraction, 1],
   ];
 
   function generateQuestionPool(n) {
