@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Profile · Hephaestus Quant</title>
-  <meta name="description" content="Forecaster profile and analytics." />
+  <meta name="description" content="User profile and 80-in-8 drill stats." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -22,13 +22,7 @@
         <a href="/kernel.html">Kernel</a>
         <a href="/doctrine.html">Doctrine</a>
         <a href="/leaderboard.html">Leaderboard</a>
-        <div class="nav-dropdown">
-          <span class="nav-dropdown-trigger">Drills</span>
-          <div class="nav-dropdown-menu">
-            <a href="/forecast.html">Forecast</a>
-            <a href="/80-in-8.html">80-in-8</a>
-          </div>
-        </div>
+        <a href="/80-in-8.html">80-in-8</a>
         <a href="/about.html">About</a>
         <a href="/apply.html">Apply</a>
         <div id="auth-ui"></div>
@@ -42,25 +36,12 @@
       <div class="loading">Loading profile...</div>
     </section>
 
-    <section id="scores-section" style="display:none;">
+    <section id="drill-section" style="display:none;">
       <div class="section-header">
-        <span class="label">Performance</span>
-        <h2>Aggregate scores</h2>
-        <p style="font-size: 0.78rem; color: var(--muted); font-family: var(--font-mono);">
-          Placeholder score (uniform random in [0, 1)). Will be replaced by a
-          real distributional scoring rule applied to your painted grid vs.
-          the realised price trajectory.
-        </p>
+        <span class="label">80-in-8</span>
+        <h2>Drill stats</h2>
       </div>
       <div class="score-cards" id="score-cards"></div>
-    </section>
-
-    <section id="forecasts-section" style="display:none;">
-      <div class="section-header">
-        <span class="label">History</span>
-        <h2>Forecast history</h2>
-      </div>
-      <ul class="forecast-list" id="forecast-list"></ul>
     </section>
 
   </main>

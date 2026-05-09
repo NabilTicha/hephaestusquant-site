@@ -15,4 +15,3 @@ SITE_URL = "https://hephaestusquant.org"
 # GOOGLE_CLIENT_SECRET and JWT_SECRET should be set as encrypted secrets:
 # wrangler pages secret put GOOGLE_CLIENT_SECRET
 # wrangler pages secret put JWT_SECRET
-# wrangler pages secret put INTERNAL_API_SECRET

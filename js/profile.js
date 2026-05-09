@@ -22,174 +22,75 @@
   loadProfile(userId);
 
   async function loadProfile(id) {
-    const tag = '[profile-diag]';
-    const diag = { phase: 'start', id };
     try {
-      diag.cookieLen = document.cookie.length;
-      diag.hasHqToken = /(?:^|;\s*)hq_token=/.test(document.cookie);
-      diag.authReady = !!(window.Auth && Auth.getUser);
-      diag.authUser = (window.Auth && Auth.getUser()) || null;
-      diag.ua = navigator.userAgent;
-      console.log(tag, 'request', diag);
-
       const res = await fetch(`/api/users/${id}`, { credentials: 'same-origin' });
-      const headers = {};
-      res.headers.forEach((v, k) => { headers[k] = v; });
-      const rawText = await res.text();
-
-      const respDiag = {
-        phase: 'response',
-        status: res.status,
-        ok: res.ok,
-        headers,
-        rawLen: rawText.length,
-        rawHead: rawText.slice(0, 300),
-      };
-      console.log(tag, 'response', respDiag);
-
       if (!res.ok) {
         document.getElementById('profile-hero').innerHTML =
-          `<div class="empty-state"><p>Server returned ${res.status}.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${escapeHtml(rawText.slice(0, 1000))}</pre></div>`;
+          `<div class="empty-state"><p>Server returned ${res.status}.</p></div>`;
         return;
       }
-
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (parseErr) {
-        throw new Error('JSON parse failed: ' + parseErr.message + ' | head=' + rawText.slice(0, 200));
-      }
-
-      const shapeDiag = {
-        phase: 'parsed',
-        topKeys: Object.keys(data || {}),
-        types: data ? Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v === null ? 'null' : Array.isArray(v) ? `array[${v.length}]` : typeof v])) : null,
-        user: data && data.user,
-        forecast_count: data && data.forecast_count,
-        avg_score: data && data.avg_score,
-        avg_score_type: data && typeof data.avg_score,
-        first_forecast: data && data.forecasts && data.forecasts[0],
-      };
-      console.log(tag, 'parsed', shapeDiag);
-
-      renderProfile(data, tag);
-      console.log(tag, 'render complete');
+      const data = await res.json();
+      renderProfile(data);
     } catch (e) {
-      console.error(tag, 'load/render failed', e, 'state=', diag);
       document.getElementById('profile-hero').innerHTML =
-        `<div class="empty-state"><p>Failed to load profile.</p><pre style="font-size:0.72rem;color:var(--muted);white-space:pre-wrap;">${escapeHtml((e && e.stack) || String(e))}</pre></div>`;
+        `<div class="empty-state"><p>Failed to load profile.</p></div>`;
     }
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  function fmtHorizon(days) {
-    if (!days) return '';
-    if (days % 365 === 0) return `${days / 365}y`;
-    if (days % 30 === 0) return `${days / 30}mo`;
-    if (days % 7 === 0) return `${days / 7}w`;
-    return `${days}d`;
   }
 
   function parseDate(s) {
     if (!s) return new Date(NaN);
-    // D1 returns datetime() as "YYYY-MM-DD HH:MM:SS" which Safari parses as
-    // Invalid Date. Normalise to ISO by swapping the space for a T.
     const iso = typeof s === 'string' && /^\d{4}-\d{2}-\d{2} /.test(s)
       ? s.replace(' ', 'T') + 'Z'
       : s;
     return new Date(iso);
   }
+
   function fmtDate(s, opts) {
     const d = parseDate(s);
     if (isNaN(d.getTime())) return '—';
     return d.toLocaleDateString('en-US', opts);
   }
-  function fmtScore(v, digits = 4) {
-    const n = typeof v === 'number' ? v : parseFloat(v);
-    return isFinite(n) ? n.toFixed(digits) : '—';
-  }
 
-  function renderProfile(data, tag = '[profile-diag]') {
-    const step = (name, v) => console.log(tag, 'render:' + name, v);
-    step('enter', { hasData: !!data });
+  function renderProfile(data) {
     const user = data.user || {};
-    const forecast_count = data.forecast_count || 0;
-    const avg_score = data.avg_score;
-    const forecasts = data.forecasts || [];
-    step('fields', {
-      user_created_at: user.created_at,
-      user_name: user.name,
-      user_picture_url: user.picture_url,
-      forecast_count,
-      avg_score,
-      avg_score_type: typeof avg_score,
-      forecasts_len: forecasts.length,
-    });
+    const drill = data.drill;
     const created = fmtDate(user.created_at, { month: 'long', year: 'numeric' });
-    step('created', created);
+    const attemptCount = drill ? drill.attempts : 0;
 
     document.getElementById('profile-hero').innerHTML = `
       <div class="profile-header">
         ${user.picture_url ? `<img src="${user.picture_url}" class="profile-avatar" referrerpolicy="no-referrer" alt="" />` : ''}
         <div class="profile-info">
           <h2 style="margin-bottom: 0.3rem;">${user.name || 'Unknown user'}</h2>
-          <span class="profile-meta">Member since ${created} · ${forecast_count} forecast${forecast_count !== 1 ? 's' : ''}</span>
+          <span class="profile-meta">Member since ${created} · ${attemptCount} drill attempt${attemptCount !== 1 ? 's' : ''}</span>
         </div>
       </div>
     `;
 
-    step('hero-set', true);
-    if (forecast_count > 0) {
-      document.getElementById('scores-section').style.display = '';
-      const cards = document.getElementById('score-cards');
+    const drillSection = document.getElementById('drill-section');
+    const cards = document.getElementById('score-cards');
+
+    if (drill && drill.best) {
+      drillSection.style.display = '';
+      const b = drill.best;
       cards.innerHTML = `
         <div class="score-card">
-          <span class="score-value">${fmtScore(avg_score, 4)}</span>
-          <span class="score-label">Avg score (placeholder)</span>
+          <span class="score-value">${b.score}</span>
+          <span class="score-label">Best score</span>
         </div>
         <div class="score-card">
-          <span class="score-value">${forecast_count}</span>
-          <span class="score-label">Forecasts</span>
+          <span class="score-value">${b.correct}</span>
+          <span class="score-label">Correct</span>
+        </div>
+        <div class="score-card">
+          <span class="score-value">${b.wrong}</span>
+          <span class="score-label">Wrong</span>
+        </div>
+        <div class="score-card">
+          <span class="score-value">${b.skipped}</span>
+          <span class="score-label">Skipped</span>
         </div>
       `;
-      step('scores-set', true);
     }
-
-    document.getElementById('forecasts-section').style.display = '';
-    const list = document.getElementById('forecast-list');
-    step('forecasts-section-shown', true);
-    if (forecasts.length === 0) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <p>No forecasts yet. <a href="/forecast.html">Submit your first forecast</a>.</p>
-        </div>
-      `;
-      return;
-    }
-
-    list.innerHTML = forecasts.map((f, i) => {
-      step('forecast:' + i, { id: f && f.id, asset: f && f.asset_id, score: f && f.score, score_type: typeof (f && f.score), horizon: f && f.horizon_days, created_at: f && f.created_at });
-      const date = fmtDate(f.created_at, { month: 'short', day: 'numeric', year: 'numeric' });
-      const horizon = fmtHorizon(f.horizon_days);
-      const score = fmtScore(f.score, 3);
-      return `
-        <li class="forecast-item">
-          <a class="forecast-item-link" href="/forecast-view.html?id=${f.id}">
-            <div class="forecast-item-main">
-              <span class="forecast-item-ticker">${f.asset_id || '—'}</span>
-              <span class="forecast-item-name">${f.asset_name || ''}</span>
-            </div>
-            <span class="forecast-item-date">${date}${horizon ? ` · ${horizon}` : ''}</span>
-            <span class="forecast-item-score">${score}</span>
-          </a>
-        </li>
-      `;
-    }).join('');
   }
 })();

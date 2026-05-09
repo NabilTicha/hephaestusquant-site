@@ -4,7 +4,6 @@ interface Env {
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_REDIRECT_URI: string;
   JWT_SECRET: string;
-  INTERNAL_API_SECRET: string;
   SITE_URL: string;
 }
 

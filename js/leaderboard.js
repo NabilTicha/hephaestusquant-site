@@ -1,89 +1,9 @@
-// leaderboard.js — tabs for Forecasts and 80-in-8 drill
+// leaderboard.js — 80-in-8 drill leaderboard
 
 (() => {
-  // ---- Tab switching ----
-  function initTabs() {
-    const container = document.getElementById('leaderboard-tabs');
-    if (!container) return;
-
-    container.innerHTML = `
-      <div class="lb-tabs">
-        <button class="lb-tab active" data-tab="forecasts">Forecasts</button>
-        <button class="lb-tab" data-tab="drill">80-in-8</button>
-      </div>
-      <div id="leaderboard-content"></div>
-    `;
-
-    container.querySelectorAll('.lb-tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        container.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        loadTab(btn.dataset.tab);
-      });
-    });
-
-    loadTab('forecasts');
-  }
-
-  function loadTab(tab) {
-    if (tab === 'forecasts') loadForecasts();
-    else if (tab === 'drill') loadDrill();
-  }
-
-  // ---- Forecasts leaderboard (original) ----
-  async function loadForecasts() {
+  async function load() {
     const content = document.getElementById('leaderboard-content');
-    content.innerHTML = '<div class="loading">Loading…</div>';
-
-    try {
-      const res = await fetch('/api/leaderboard');
-      const data = await res.json();
-
-      if (!data.leaderboard || data.leaderboard.length === 0) {
-        content.innerHTML = `
-          <div class="empty-state">
-            <p>No forecasts yet. Be the first to <a href="/forecast.html">submit a forecast</a>.</p>
-          </div>
-        `;
-        return;
-      }
-
-      content.innerHTML = `
-        <p class="lb-note">Avg score across all forecasts. Placeholder; will be replaced by grid-based scoring.</p>
-        <table class="lb-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>Avg score</th>
-              <th>Forecasts</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.leaderboard.map(row => `
-              <tr>
-                <td class="lb-rank">${row.rank}</td>
-                <td>
-                  <div class="lb-user">
-                    ${row.picture_url ? `<img src="${row.picture_url}" class="lb-avatar" referrerpolicy="no-referrer" alt="" />` : ''}
-                    <span class="lb-name"><a href="/profile.html?id=${row.user_id}">${row.name}</a></span>
-                  </div>
-                </td>
-                <td class="lb-score">${row.score != null ? row.score.toFixed(4) : '—'}</td>
-                <td class="lb-count">${row.forecast_count}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    } catch {
-      content.innerHTML = '<div class="empty-state"><p>Failed to load leaderboard.</p></div>';
-    }
-  }
-
-  // ---- 80-in-8 leaderboard ----
-  async function loadDrill() {
-    const content = document.getElementById('leaderboard-content');
+    if (!content) return;
     content.innerHTML = '<div class="loading">Loading…</div>';
 
     try {
@@ -92,7 +12,6 @@
 
       const { leaderboard, personal } = data;
 
-      // Personal best banner (only shown when signed in and attempted)
       let personalHtml = '';
       if (personal && personal.best) {
         const b = personal.best;
@@ -108,7 +27,6 @@
           </div>
         `;
       } else if (personal === null) {
-        // Authenticated but no attempts
         personalHtml = `
           <div class="lb-personal lb-personal-cta">
             <p>You haven't taken the drill yet.</p>
@@ -167,23 +85,5 @@
     }
   }
 
-  // ---- Boot ----
-  // The existing leaderboard.html likely has <div id="leaderboard-content">.
-  // We need it to have <div id="leaderboard-tabs"> instead for tab switching.
-  // If that div doesn't exist we gracefully fall back to replacing leaderboard-content.
-  document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('leaderboard-tabs')) {
-      initTabs();
-    } else {
-      // Fallback: wrap existing content div
-      const existing = document.getElementById('leaderboard-content');
-      if (existing) {
-        const wrapper = document.createElement('div');
-        wrapper.id = 'leaderboard-tabs';
-        existing.parentNode.insertBefore(wrapper, existing);
-        wrapper.appendChild(existing);
-        initTabs();
-      }
-    }
-  });
+  document.addEventListener('DOMContentLoaded', load);
 })();
