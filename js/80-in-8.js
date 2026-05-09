@@ -116,14 +116,14 @@
     const a = randInt(20, 99);
     const b = randInt(20, 99);
     const ans = a + b;
-    return makeQuestion(`${a} + ${b}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${a} + ${b} = ?`, fmt(ans), intDistractors(ans));
   }
 
   function genIntSub() {
     const a = randInt(50, 199);
     const b = randInt(20, a - 5);
     const ans = a - b;
-    return makeQuestion(`${a} − ${b}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${a} − ${b} = ?`, fmt(ans), intDistractors(ans));
   }
 
   function genIntMul() {
@@ -135,14 +135,14 @@
     ];
     const [a, b] = pick(variants)();
     const ans = a * b;
-    return makeQuestion(`${a} × ${b}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${a} × ${b} = ?`, fmt(ans), intDistractors(ans));
   }
 
   function genIntDiv() {
     const divisor = randInt(2, 15);
     const quotient = randInt(3, 18);
     const dividend = divisor * quotient;
-    return makeQuestion(`${dividend} ÷ ${divisor}`, fmt(quotient), intDistractors(quotient));
+    return makeQuestion(`${dividend} ÷ ${divisor} = ?`, fmt(quotient), intDistractors(quotient));
   }
 
   function genDecMul() {
@@ -164,7 +164,7 @@
       },
     ];
     const [a, b, ans] = pick(variants)();
-    return makeQuestion(`${a} × ${b}`, fmt(ans), decDistractors(ans));
+    return makeQuestion(`${a} × ${b} = ?`, fmt(ans), decDistractors(ans));
   }
 
   function genDecDiv() {
@@ -181,7 +181,7 @@
       },
     ];
     const [a, b, ans] = pick(variants)();
-    return makeQuestion(`${a} ÷ ${b}`, fmt(ans), decDistractors(ans));
+    return makeQuestion(`${a} ÷ ${b} = ?`, fmt(ans), decDistractors(ans));
   }
 
   function genFracTimesInt() {
@@ -190,7 +190,7 @@
     const multiplier = randInt(2, 10);
     const integer = denom * multiplier;
     const ans = num * multiplier;
-    return makeQuestion(`${num}/${denom} × ${integer}`, fmt(ans), intDistractors(ans));
+    return makeQuestion(`${num}/${denom} × ${integer} = ?`, fmt(ans), intDistractors(ans));
   }
 
   function genFracToDec() {
@@ -215,7 +215,7 @@
       [[1,2],[1,3],[5,6]], [[2,5],[1,10],[1,2]],
     ];
     const [[an, ad], [bn, bd], [rn, rd]] = pick(sets);
-    const q = `${an}/${ad} + ${bn}/${bd}`;
+    const q = `${an}/${ad} + ${bn}/${bd} = ?`;
     const ans = `${rn}/${rd}`;
     return makeQuestion(q, ans, fracDistractors(rn, rd));
   }
@@ -313,7 +313,7 @@
   function renderQuestion() {
     const q = questions[qIdx];
     if (!q) return;
-    document.getElementById('question').textContent = `${q.q} = ?`;
+    document.getElementById('question').textContent = q.q;
     const container = document.getElementById('choices');
     container.innerHTML = '';
     for (const choice of q.choices) {
