@@ -2402,3 +2402,221 @@ code {
   .prob-q-card { padding: var(--space-md); }
 }
 
+/* ================================================
+   Coding Problems
+   ================================================ */
+
+.coding-problem {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  transition: border-color 0.25s;
+}
+
+.coding-problem:hover {
+  border-color: rgba(184, 156, 75, 0.14);
+}
+
+/* ---- Problem header ---- */
+.coding-problem-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: 0.5rem;
+}
+
+.coding-num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.coding-tag {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 0.1rem 0.45rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.coding-diff {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.coding-diff--medium {
+  color: #d69e2e;
+  background: rgba(214, 158, 46, 0.1);
+  border: 1px solid rgba(214, 158, 46, 0.25);
+}
+
+.coding-diff--hard {
+  color: #e53e3e;
+  background: rgba(229, 62, 62, 0.1);
+  border: 1px solid rgba(229, 62, 62, 0.25);
+}
+
+.coding-problem-title {
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 400;
+  color: var(--text-heading);
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.coding-problem-source {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-bottom: var(--space-md);
+}
+
+/* ---- Body content ---- */
+.coding-body {
+  margin-top: var(--space-sm);
+}
+
+.coding-h4 {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  margin: var(--space-md) 0 var(--space-xs);
+}
+
+.coding-body > .coding-h4:first-child {
+  margin-top: 0;
+}
+
+.coding-list {
+  margin: 0 0 var(--space-sm) var(--space-md);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.coding-list li { margin-bottom: 0.2rem; }
+
+.coding-list--ol {
+  list-style: decimal;
+}
+
+/* ---- Code blocks ---- */
+.code-block {
+  background: #0B0D10;
+  border: 1px solid rgba(184, 156, 75, 0.12);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-md);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: #ccccd4;
+  white-space: pre;
+  margin: var(--space-sm) 0;
+}
+
+/* ---- Expandable details ---- */
+.coding-detail {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-top: var(--space-sm);
+  overflow: hidden;
+}
+
+.coding-detail[open] {
+  border-color: var(--border-strong);
+}
+
+.coding-detail--warn {
+  border-color: rgba(229, 62, 62, 0.2);
+}
+
+.coding-detail--warn[open] {
+  border-color: rgba(229, 62, 62, 0.35);
+}
+
+.coding-detail summary {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 0.65rem var(--space-md);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg);
+  transition: background 0.15s;
+}
+
+.coding-detail summary::-webkit-details-marker { display: none; }
+
+.coding-detail summary::after {
+  content: '›';
+  margin-left: auto;
+  font-size: 1rem;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.coding-detail[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.coding-detail summary:hover {
+  background: var(--surface);
+  color: var(--text-heading);
+}
+
+.coding-detail--warn summary {
+  color: #e53e3e;
+}
+
+.coding-detail-body {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border-top: 1px solid var(--border);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.coding-detail-body p + p {
+  margin-top: var(--space-sm);
+}
+
+.coding-detail-body code {
+  font-size: 0.83em;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .coding-problem {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .coding-problem-meta {
+    flex-wrap: wrap;
+  }
+
+  .code-block {
+    font-size: 0.72rem;
+    padding: var(--space-sm);
+  }
+}
+
