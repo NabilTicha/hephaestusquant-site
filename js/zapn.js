@@ -63,15 +63,33 @@
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height;
-        const fb    = $('sm-fb');
+        const fb = $('sm-fb');
 
-        const zS  = 0.22 + Math.random() * 0.30;
-        const zE  = Math.min(zS + 0.14 + Math.random() * 0.12, 0.88);
-        const dur = 2500 + Math.random() * 2000;
+        // Progressive difficulty: each round gets faster and the zone narrows
+        const speed     = 1 + round * 0.35;               // 1.0 → 2.4×
+        const baseDur   = 4200 / speed;
+        const dur       = baseDur * (0.8 + Math.random() * 0.4);
+        const zoneWidth = Math.max(0.09, 0.21 - round * 0.025); // 0.21 → 0.11
+
+        // Initial zone position
+        let zS = 0.18 + Math.random() * 0.34;
+        let zE = Math.min(zS + zoneWidth, 0.90);
+
+        // Rounds 3-5: zone shifts once when bar crosses ~40%
+        const willShift   = round >= 2;
+        const shiftPoint  = 0.35 + Math.random() * 0.20;
+        let   shifted     = false;
 
         let prog = 0, t0 = null, animId, clicked = false;
 
         function draw() {
+          // Zone shift: fire once when prog passes shiftPoint
+          if (willShift && !shifted && prog >= shiftPoint) {
+            shifted = true;
+            zS = 0.18 + Math.random() * 0.34;
+            zE = Math.min(zS + zoneWidth, 0.90);
+          }
+
           ctx.clearRect(0, 0, W, H);
           // track background
           ctx.fillStyle = '#111318';
@@ -89,16 +107,21 @@
           ctx.strokeStyle = '#38a169';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(0, zoneY);       ctx.lineTo(W, zoneY);
-          ctx.moveTo(0, zoneY + zoneH); ctx.lineTo(W, zoneY + zoneH);
+          ctx.moveTo(0, zoneY);            ctx.lineTo(W, zoneY);
+          ctx.moveTo(0, zoneY + zoneH);    ctx.lineTo(W, zoneY + zoneH);
           ctx.stroke();
           // fill bar rising from bottom
           const fillH = prog * H;
-          const grad = ctx.createLinearGradient(0, H - fillH, 0, H);
+          const grad  = ctx.createLinearGradient(0, H - fillH, 0, H);
           grad.addColorStop(0, '#C2A75E');
           grad.addColorStop(1, '#8A6F2A');
           ctx.fillStyle = grad;
           ctx.fillRect(12, H - fillH, W - 24, fillH);
+          // round label overlay
+          ctx.fillStyle = 'rgba(133,133,146,0.7)';
+          ctx.font = '10px monospace';
+          ctx.textAlign = 'right';
+          ctx.fillText(`R${round + 1}`, W - 5, 14);
         }
 
         function frame(t) {
@@ -277,11 +300,36 @@
         return { start: cur, goal, depth };
       }
 
+      // BFS: compute the true minimum moves from start to goal
+      function computeOptimal(start, goal) {
+        const enc     = s => JSON.stringify(s);
+        const goalKey = enc(goal);
+        const startKey = enc(start);
+        if (startKey === goalKey) return 0;
+        const visited = new Set([startKey]);
+        const queue   = [[start, 0]];
+        while (queue.length) {
+          const [st, d] = queue.shift();
+          for (let src = 0; src < 3; src++) {
+            if (!st[src].length) continue;
+            for (let dst = 0; dst < 3; dst++) {
+              if (src === dst) continue;
+              const ns = st.map(a => [...a]);
+              ns[dst].push(ns[src].pop());
+              const k = enc(ns);
+              if (k === goalKey) return d + 1;
+              if (!visited.has(k)) { visited.add(k); queue.push([ns, d + 1]); }
+            }
+          }
+        }
+        return -1;
+      }
+
       function startPuzzle() {
         const p = genPuzzle(3 + puzzle);
         state     = p.start;
         goalState = p.goal;
-        optDepth  = p.depth;
+        optDepth  = computeOptimal(p.start, p.goal); // true BFS optimal
         moveCount = 0;
         selected  = null;
         renderBoard();
@@ -372,14 +420,16 @@
           moveCount++;
           selected = null;
           if (state.every((s, i) => JSON.stringify(s) === JSON.stringify(goalState[i]))) {
-            const pts = Math.max(10, moveCount <= optDepth ? 100 : 100 - (moveCount - optDepth) * 6);
+            const extra = moveCount - optDepth; // 0 = perfect
+            const pts   = Math.max(10, 100 - extra * 10);
             totalScore += pts;
+            const verdict = extra === 0
+              ? 'Optimal path!'
+              : `${extra} extra move${extra > 1 ? 's' : ''} (optimal: ${optDepth})`;
             el.innerHTML = `
               <div class="zapn-sky-wrap">
                 <div class="zapn-feedback zapn-feedback--good" style="font-size:1.2rem">Solved in ${moveCount} moves! +${pts} pts</div>
-                <p style="margin-top:0.8rem;color:var(--text-secondary)">
-                  ${moveCount <= optDepth ? 'Optimal path!' : `${moveCount - optDepth} extra move${moveCount - optDepth > 1 ? 's' : ''}`}
-                </p>
+                <p style="margin-top:0.8rem;color:var(--text-secondary)">${verdict}</p>
               </div>`;
             puzzle++;
             if (puzzle >= PUZZLES) {
@@ -829,7 +879,9 @@
         answered = false;
         clearInterval(timerInterval);
 
-        const len    = round >= 5 ? 5 : 4;
+        // Progressive: 4 digits → 5 → 6 → 7; time 3.4s → 1.4s
+        const len    = 4 + Math.floor(round / 3);          // 4,4,4,5,5,5,6,6,6,6
+        const timeLimit = Math.max(1.4, 3.4 - round * 0.22);
         const code   = Array.from({ length: len }, () => Math.floor(Math.random() * 10)).join('');
         const opts   = [code];
         let attempts = 0;
@@ -838,8 +890,7 @@
           if (!opts.includes(d)) opts.push(d);
         }
         while (opts.length < 4) opts.push(genDistractor(code + '0').slice(0, len));
-        const shuffled  = shuffle(opts);
-        const timeLimit = Math.max(1.5, 3.6 - round * 0.18);
+        const shuffled = shuffle(opts);
 
         el.innerHTML = `
           <div class="zapn-cc-wrap">
