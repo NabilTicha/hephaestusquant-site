@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zap-N · Hephaestus Quant</title>
+  <meta name="description" content="Prepare for the Optiver Zap-N cognitive assessment. Nine games testing reaction time, risk management, planning, attention, working memory, task-switching, arithmetic, pattern recognition, and logical deduction." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=3" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <a href="/80-in-8.html">80-in-8</a>
+        <a href="/zapn.html" class="active">Zap-N</a>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ── INTRO ─────────────────────────────────────────────── -->
+    <section id="zapn-intro">
+
+      <div class="hero">
+        <span class="label">Cognitive Assessment · Optiver-style</span>
+        <h1>Zap-N</h1>
+        <p class="subtitle">
+          Nine cognitive games. Reaction time, risk management, planning, selective attention,
+          working memory, task-switching, mental arithmetic, pattern recognition, and logical deduction.
+          Modeled on the Optiver Zap-N trader-candidate assessment.
+        </p>
+      </div>
+
+      <div class="section-header">
+        <span class="label">Games</span>
+        <h2>What you'll face</h2>
+      </div>
+
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">1 · Stock Master</span>
+          <span class="item-text">Reaction time. A bar rises at varying speeds — click when it enters the green zone. Tests split-second patience: not too early, not too late.</span>
+        </li>
+        <li>
+          <span class="item-tag">2 · Balloon</span>
+          <span class="item-text">Risk management. Pump a balloon to earn coins, but each pump raises burst probability. Cash out to bank earnings, or push for more. Based on the Balloon Analog Risk Task (BART).</span>
+        </li>
+        <li>
+          <span class="item-tag">3 · Skyscraper</span>
+          <span class="item-text">Planning. Rearrange colored blocks across three stacks to match a target layout using as few moves as possible. Tests multi-step look-ahead under constraints.</span>
+        </li>
+        <li>
+          <span class="item-tag">4 · Shapeshift</span>
+          <span class="item-text">Selective attention. A circle or square flashes left or right. Respond to the <em>shape</em>, ignoring position. Based on the Simon effect (1963).</span>
+        </li>
+        <li>
+          <span class="item-tag">5 · Digit</span>
+          <span class="item-text">Working memory. Digits flash one at a time — recall them in order, then in reverse. Sequences scale up until you fail twice at the same length.</span>
+        </li>
+        <li>
+          <span class="item-tag">6 · The Switch</span>
+          <span class="item-text">Cognitive flexibility. Left panel = addition problem. Right panel = arrow comparison. Screen position tells you which task to solve. The challenge is the constant switching.</span>
+        </li>
+        <li>
+          <span class="item-tag">7 · Number Box</span>
+          <span class="item-text">Mental arithmetic. Use all four given numbers with any arithmetic operations to reach a target. A modernized 24 Game — creativity under pressure.</span>
+        </li>
+        <li>
+          <span class="item-tag">8 · Code Compare</span>
+          <span class="item-text">Pattern recognition. A numeric code appears at the top. Match it to one of four options before the timer runs out. Speed tightens each round.</span>
+        </li>
+        <li>
+          <span class="item-tag">9 · Figure It Out</span>
+          <span class="item-text">Logical deduction. A hidden figure has three attributes (shape, color, pattern). Guess and receive correct/wrong feedback per attribute. Fewer guesses = higher score. Mastermind-style.</span>
+        </li>
+      </ul>
+
+      <div class="cta-block">
+        <button id="zapn-start-btn" class="btn btn-primary">Start Zap-N</button>
+      </div>
+
+    </section>
+
+    <!-- ── GAME AREA ──────────────────────────────────────────── -->
+    <section id="zapn-game" style="display:none">
+
+      <div class="zapn-progress-bar-wrap">
+        <div class="zapn-progress-fill" id="zapn-progress-fill"></div>
+      </div>
+
+      <div class="zapn-game-header">
+        <span class="label" id="zapn-game-label">Game 1 / 9</span>
+        <h1 id="zapn-game-title">Stock Master</h1>
+        <p class="subtitle" id="zapn-game-subtitle"></p>
+      </div>
+
+      <!-- Instruction card (shown before game starts) -->
+      <div id="zapn-instruction-card" class="card zapn-instruction-card">
+        <p id="zapn-hint-text" class="zapn-hint"></p>
+        <button id="zapn-ready-btn" class="btn btn-primary">I'm Ready</button>
+      </div>
+
+      <!-- Live game area -->
+      <div id="zapn-game-area" style="display:none"></div>
+
+    </section>
+
+    <!-- ── RESULTS ────────────────────────────────────────────── -->
+    <section id="zapn-results" style="display:none">
+
+      <div class="hero">
+        <span class="label">Test complete</span>
+        <h1>Zap-N Results</h1>
+        <p class="subtitle">Your scores across all nine cognitive assessments.</p>
+      </div>
+
+      <div class="section-header">
+        <span class="label">Breakdown</span>
+        <h2>Per-game scores</h2>
+      </div>
+
+      <div id="zapn-scores-list" class="zapn-scores-list"></div>
+
+      <div class="cta-block">
+        <button id="zapn-restart-btn" class="btn btn-primary">Retake Test</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>2025</span>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/zapn.js"></script>
+
+</body>
+</html>
