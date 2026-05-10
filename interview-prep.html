@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Profile · Hephaestus Quant</title>
-  <meta name="description" content="User profile and 80-in-8 drill stats." />
+  <title>Interview Prep · Hephaestus Quant</title>
+  <meta name="description" content="Company-specific interview preparation tracks. Select a firm to access its full set of practice assessments." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=7" />
 </head>
 <body>
 
@@ -26,7 +26,7 @@
         <a href="/zapn.html">Zap-N</a>
         <a href="/probability.html">Math</a>
         <a href="/coding.html">Coding</a>
-        <a href="/interview-prep.html">Interview Prep</a>
+        <a href="/interview-prep.html" class="active">Interview Prep</a>
         <a href="/about.html">About</a>
         <a href="/apply.html">Apply</a>
         <div id="auth-ui"></div>
@@ -36,17 +36,32 @@
 
   <main class="container">
 
-    <section class="hero" id="profile-hero">
-      <div class="loading">Loading profile...</div>
-    </section>
+    <div class="hero">
+      <span class="label">Recruitment · Practice Tracks</span>
+      <h1>Interview Prep</h1>
+      <p class="subtitle">
+        Company-specific preparation tracks. Select a firm to access its full
+        set of practice assessments.
+      </p>
+    </div>
 
-    <section id="drill-section" style="display:none;">
-      <div class="section-header">
-        <span class="label">80-in-8</span>
-        <h2>Drill stats</h2>
+    <div class="section-header">
+      <span class="label">Companies</span>
+      <h2>Available tracks</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <span class="label">Trading Firm · Amsterdam / Chicago / Sydney</span>
+        <h3>Optiver</h3>
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin:var(--space-sm) 0;max-width:480px">
+          Four preparation modules covering every stage of the Optiver recruitment process:
+          mental math, cognitive assessment, quantitative reasoning, and coding.
+          All content is drawn directly from reported assessments.
+        </p>
+        <a href="/optiver-prep.html" class="btn btn-primary" style="margin-top:var(--space-sm)">Start prep →</a>
       </div>
-      <div class="score-cards" id="score-cards"></div>
-    </section>
+    </div>
 
   </main>
 
@@ -58,7 +73,6 @@
   </footer>
 
   <script src="/js/auth.js"></script>
-  <script src="/js/profile.js"></script>
 
 </body>
 </html>
