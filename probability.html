@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Probability Tests · Hephaestus Quant</title>
+  <meta name="description" content="20 Optiver-style probability questions drawn from real interviews. Dice, coins, cards, Bayes, expected value, and stochastic processes. Practice individually or take the full timed test." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=5" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="site-name">Hephaestus Quant</a>
+      <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav>
+        <a href="/kernel.html">Kernel</a>
+        <a href="/doctrine.html">Doctrine</a>
+        <a href="/leaderboard.html">Leaderboard</a>
+        <a href="/80-in-8.html">80-in-8</a>
+        <a href="/zapn.html">Zap-N</a>
+        <a href="/probability.html" class="active">Probability</a>
+        <a href="/about.html">About</a>
+        <a href="/apply.html">Apply</a>
+        <div id="auth-ui"></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ── LIST VIEW (default) ─────────────────────────────── -->
+    <section id="prob-list">
+
+      <div class="hero">
+        <span class="label">Quantitative · Optiver-style</span>
+        <h1>Probability Tests</h1>
+        <p class="subtitle">
+          20 probability problems drawn directly from Optiver interview reports.
+          Practice questions individually or take the full timed test and see your
+          score broken down by category.
+        </p>
+      </div>
+
+      <div class="cta-block" style="padding-bottom:0">
+        <button id="prob-start-all" class="btn btn-primary">Start Full Test — 20 questions</button>
+      </div>
+
+      <div style="margin-top:var(--space-xl)" id="prob-category-list"></div>
+
+      <!-- Tips -->
+      <div class="section-header" style="margin-top:var(--space-xl)">
+        <span class="label">From candidates</span>
+        <h2>Tips</h2>
+      </div>
+      <ul class="item-list">
+        <li>
+          <span class="item-tag">Beat the Odds</span>
+          <span class="item-text">The "Beat the Odds" section of the Optiver assessment gives you 90 seconds per question. Speed matters as much as correctness.</span>
+        </li>
+        <li>
+          <span class="item-tag">Topics</span>
+          <span class="item-text">Confirmed topic list from a Quantitative Trading Intern candidate: expectation, variance, conditional probability, Markov chains, Martingales, and Bayes' Theorem.</span>
+        </li>
+        <li>
+          <span class="item-tag">Card questions</span>
+          <span class="item-text">Card combinatorics (pairs, flushes, hands) are repeatedly cited across Glassdoor Optiver reviews — know your C(52,5) and hand probabilities cold.</span>
+        </li>
+        <li>
+          <span class="item-tag">Mental model</span>
+          <span class="item-text">Interviewers report that the reasoning process matters as much as the final number. Practice articulating your Bayes and EV logic out loud.</span>
+        </li>
+      </ul>
+
+    </section>
+
+    <!-- ── QUESTION VIEW (practice & test) ──────────────────── -->
+    <section id="prob-question" style="display:none">
+
+      <div class="prob-q-header">
+        <span id="pq-meta" style="font-family:var(--font-mono);font-size:0.78rem;color:var(--muted)"></span>
+        <button id="pq-back-btn" class="btn btn-sm">← Back to list</button>
+      </div>
+
+      <div class="card prob-q-card">
+        <span class="prob-q-category-label" id="pq-category"></span>
+        <p class="prob-q-text" id="pq-text"></p>
+        <div class="prob-choices" id="pq-choices"></div>
+        <div class="prob-explanation" id="pq-explanation" style="display:none"></div>
+        <button class="btn btn-primary" id="pq-next" style="display:none;margin-top:var(--space-sm)">Next →</button>
+      </div>
+
+    </section>
+
+    <!-- ── RESULTS VIEW ──────────────────────────────────────── -->
+    <section id="prob-results" style="display:none">
+
+      <div class="hero">
+        <span class="label">Test complete</span>
+        <h1>Score: <span id="pr-score-text">0 / 20</span></h1>
+        <p class="subtitle" id="pr-verdict"></p>
+      </div>
+
+      <div class="section-header">
+        <span class="label">Breakdown</span>
+        <h2>By category</h2>
+      </div>
+      <div id="pr-categories" style="max-width:700px;margin-bottom:var(--space-xl)"></div>
+
+      <div class="section-header">
+        <span class="label">Review</span>
+        <h2 id="pr-wrong-heading">Wrong answers</h2>
+      </div>
+      <div id="pr-wrong" style="margin-bottom:var(--space-xl)"></div>
+
+      <div class="cta-block">
+        <button id="pr-restart" class="btn btn-primary">Retake Test</button>
+        <button id="pr-back-list" class="btn" style="margin-left:var(--space-sm)">Back to list</button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span>Hephaestus Quant · TU Delft</span>
+      <span>2025</span>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/probability.js?v=1"></script>
+
+</body>
+</html>
