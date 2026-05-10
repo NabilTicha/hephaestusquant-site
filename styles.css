@@ -1361,60 +1361,63 @@ code {
   margin-bottom: var(--space-md);
 }
 
-.zapn-sm-arena {
-  position: relative;
-  width: 80px;
-  height: 260px;
-  margin: 0 auto;
+.zapn-sm-outer {
+  display: inline-block;
+  cursor: pointer;
+  padding: var(--space-sm);
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
   user-select: none;
 }
 
-.zapn-sm-arena:hover {
+.zapn-sm-outer:hover {
   border-color: var(--accent);
+}
+
+.zapn-sm-track {
+  position: relative;
+  width: 80px;
+  height: 260px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
 }
 
 .zapn-sm-zone {
   position: absolute;
   left: 0;
   right: 0;
-  background: rgba(56, 161, 105, 0.22);
-  border-top: 1px solid #38a169;
-  border-bottom: 1px solid #38a169;
+  background: rgba(56, 161, 105, 0.28);
+  border-top: 2px solid #38a169;
+  border-bottom: 2px solid #38a169;
   pointer-events: none;
+  z-index: 1;
 }
 
-.zapn-sm-needle {
+.zapn-sm-fill {
   position: absolute;
-  left: 6px;
-  right: 6px;
-  height: 4px;
-  background: var(--accent);
-  border-radius: 2px;
-  pointer-events: none;
-}
-
-.zapn-sm-hint-text {
-  position: absolute;
-  bottom: 6px;
+  bottom: 0;
   left: 0;
   right: 0;
-  font-size: 0.5rem;
-  text-align: center;
-  color: var(--muted);
+  height: 0%;
+  background: var(--accent);
   pointer-events: none;
-  letter-spacing: 0.02em;
+  z-index: 2;
+}
+
+.zapn-sm-click-prompt {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: var(--space-sm) 0 var(--space-xs);
 }
 
 .zapn-sm-score {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--text-secondary);
-  margin-top: var(--space-sm);
+  margin-top: var(--space-xs);
 }
 
 /* ================================================
@@ -1592,6 +1595,35 @@ code {
   font-size: 0.78rem;
   color: var(--text-secondary);
   margin-bottom: var(--space-sm);
+}
+
+/* carrying-state indicator shown above the boards */
+.zapn-sky-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-height: 2.2rem;
+  margin-bottom: var(--space-sm);
+}
+
+.zapn-sky-status--carrying {
+  color: var(--accent);
+}
+
+/* small copy of the block shown in the carrying indicator */
+.zapn-sky-carried-block {
+  transform: scale(1.15);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* top block of the selected stack — visually lifted */
+.zapn-sky-block--lifted {
+  opacity: 0.35;
+  outline: 2px dashed rgba(255, 255, 255, 0.45);
+  outline-offset: -2px;
 }
 
 /* ================================================

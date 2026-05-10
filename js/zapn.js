@@ -43,11 +43,13 @@
         el.innerHTML = `
           <div class="zapn-sm-wrap">
             <div class="zapn-sm-meta">Round <span id="sm-r">${round + 1}</span> / ${ROUNDS}</div>
-            <div class="zapn-sm-arena" id="sm-arena">
-              <div class="zapn-sm-zone" id="sm-zone"></div>
-              <div class="zapn-sm-needle" id="sm-needle"></div>
-              <span class="zapn-sm-hint-text">click when in zone</span>
+            <div class="zapn-sm-outer" id="sm-outer">
+              <div class="zapn-sm-track">
+                <div class="zapn-sm-zone" id="sm-zone"></div>
+                <div class="zapn-sm-fill" id="sm-fill"></div>
+              </div>
             </div>
+            <p class="zapn-sm-click-prompt">Click the track when the bar reaches the green zone</p>
             <div class="zapn-sm-score">Score: <span id="sm-total">${total}</span> / ${ROUNDS * 100}</div>
             <div id="sm-fb" class="zapn-feedback"></div>
           </div>`;
@@ -55,25 +57,26 @@
       }
 
       function runRound() {
-        const arena  = $('sm-arena');
-        const zone   = $('sm-zone');
-        const needle = $('sm-needle');
-        const fb     = $('sm-fb');
+        const outer = $('sm-outer');
+        const zone  = $('sm-zone');
+        const fill  = $('sm-fill');
+        const fb    = $('sm-fb');
 
-        const zS  = 0.18 + Math.random() * 0.38;
-        const zE  = Math.min(zS + 0.12 + Math.random() * 0.14, 0.92);
-        const dur = 2200 + Math.random() * 2200;
+        // Zone defined from bottom (same coordinate system as fill height)
+        const zS  = 0.22 + Math.random() * 0.30;
+        const zE  = Math.min(zS + 0.14 + Math.random() * 0.12, 0.88);
+        const dur = 2400 + Math.random() * 2000;
 
-        zone.style.top    = `${zS * 100}%`;
+        zone.style.bottom = `${zS * 100}%`;
         zone.style.height = `${(zE - zS) * 100}%`;
-        needle.style.top  = '100%';
+        fill.style.height = '0%';
 
         let prog = 0, t0 = null, animId, clicked = false;
 
         function frame(t) {
           if (!t0) t0 = t;
           prog = Math.min((t - t0) / dur, 1);
-          needle.style.top = `${(1 - prog) * 100}%`;
+          fill.style.height = `${prog * 100}%`;
           if (prog < 1 && !clicked) {
             animId = requestAnimationFrame(frame);
           } else if (!clicked) {
@@ -83,12 +86,13 @@
         }
         animId = requestAnimationFrame(frame);
 
-        arena.onclick = () => {
+        outer.addEventListener('click', function onClick() {
           if (clicked) return;
           clicked = true;
           cancelAnimationFrame(animId);
+          outer.removeEventListener('click', onClick);
           resolve();
-        };
+        });
 
         function resolve() {
           let pts = 0;
@@ -107,7 +111,7 @@
             fb.className = 'zapn-feedback zapn-feedback--bad';
           }
           total += pts;
-          $('sm-total').textContent = total;
+          if ($('sm-total')) $('sm-total').textContent = total;
           round++;
           if (round >= ROUNDS) {
             setTimeout(() => done(Math.round(total / ROUNDS), `${total} / ${ROUNDS * 100}`), 1400);
@@ -266,9 +270,19 @@
           ...state.map(s => s.length),
           ...goalState.map(s => s.length), 1
         );
+        const carriedBlock = selected !== null ? state[selected][state[selected].length - 1] : null;
+
         el.innerHTML = `
           <div class="zapn-sky-wrap">
             <div class="zapn-sky-meta">Puzzle ${puzzle + 1} / ${PUZZLES} · Moves: ${moveCount}</div>
+
+            <div class="zapn-sky-status${selected !== null ? ' zapn-sky-status--carrying' : ''}">
+              ${selected !== null
+                ? `<div class="zapn-sky-block zapn-sky-carried-block" style="background:${COLORS[carriedBlock]}">${NAMES[carriedBlock]}</div>
+                   <span>Carrying — click a stack to place</span>`
+                : `<span>Click a stack to pick up its top block</span>`}
+            </div>
+
             <div class="zapn-sky-boards">
               <div class="zapn-sky-board">
                 <div class="zapn-sky-label">Current</div>
@@ -280,23 +294,37 @@
                 <div class="zapn-sky-stacks">${stacksHTML(goalState, maxH, false)}</div>
               </div>
             </div>
-            <p class="zapn-sky-hint">Click a source stack, then a destination.</p>
+
             <div id="sky-fb" class="zapn-feedback"></div>
+            <button class="btn btn-sm" id="sky-skip" style="margin-top:var(--space-md);opacity:0.5">Skip this puzzle (0 pts)</button>
           </div>`;
 
         el.querySelectorAll('#sky-cur .zapn-sky-stack').forEach((s, i) => {
           s.addEventListener('click', () => handleClick(i));
           if (selected === i) s.classList.add('zapn-sky-selected');
         });
+
+        $('sky-skip').onclick = () => {
+          selected = null;
+          puzzle++;
+          if (puzzle >= PUZZLES) {
+            done(Math.round(totalScore / PUZZLES), `${totalScore} / ${PUZZLES * 100}`);
+          } else {
+            setTimeout(startPuzzle, 200);
+          }
+        };
       }
 
       function stacksHTML(stacks, maxH, interactive) {
         return stacks.map((stack, i) => {
-          const visual  = [...stack].reverse();
-          const empties = maxH - visual.length;
+          const visual    = [...stack].reverse();
+          const empties   = maxH - visual.length;
+          const isCarried = interactive && selected === i;
           return `<div class="zapn-sky-stack${interactive ? ' zapn-sky-stack--interactive' : ''}">
             ${Array(empties).fill('<div class="zapn-sky-empty-slot"></div>').join('')}
-            ${visual.map(b => `<div class="zapn-sky-block" style="background:${COLORS[b]}">${NAMES[b]}</div>`).join('')}
+            ${visual.map((b, vi) =>
+              `<div class="zapn-sky-block${isCarried && vi === 0 ? ' zapn-sky-block--lifted' : ''}" style="background:${COLORS[b]}">${NAMES[b]}</div>`
+            ).join('')}
             <div class="zapn-sky-base"></div>
           </div>`;
         }).join('');
