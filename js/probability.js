@@ -244,6 +244,182 @@
       answer: 2,
       explanation: 'P(2-set finish) = P(A wins 2-0) + P(B wins 2-0) = ¼ + ¼ = ½. P(3-set finish) = 1 − ½ = ½. Both outcomes are equally likely. The bet only matters based on the offered payout odds.',
     },
+
+    // ---- Linear Algebra (QR) ------------------------------------
+    {
+      id: 21, category: 'Linear Algebra (QR)', track: 'qr',
+      title: 'Eigenvalues of a Covariance Matrix',
+      summary: 'What can always be said about the eigenvalues of a covariance matrix?',
+      source: 'Glassdoor / Teamblind (QR)',
+      text: 'The eigenvalues of a real covariance matrix Σ must always be:',
+      options: [
+        'All strictly positive (Σ must be positive definite)',
+        'All real and non-negative',
+        'All integers',
+        'Possibly complex, depending on the data',
+      ],
+      answer: 1,
+      explanation: 'Covariance matrices are symmetric, so the spectral theorem guarantees real eigenvalues. They are also positive semi-definite (xᵀΣx ≥ 0 for all x), so eigenvalues are ≥ 0. They need not be strictly positive — a singular covariance matrix (e.g., from fewer observations than features) has at least one zero eigenvalue.',
+    },
+    {
+      id: 22, category: 'Linear Algebra (QR)', track: 'qr',
+      title: 'Rank of Sample Covariance When n < p',
+      summary: 'What happens to the covariance matrix when observations are fewer than features?',
+      source: 'Teamblind (QR)',
+      text: 'A sample covariance matrix is estimated from n = 50 observations of p = 100 features. This matrix is guaranteed to be:',
+      options: [
+        'Positive definite and invertible',
+        'Singular — rank at most n − 1 = 49',
+        'Full rank p = 100',
+        'Negative semi-definite',
+      ],
+      answer: 1,
+      explanation: 'The sample covariance matrix is built from n outer products in ℝᵖ. When n < p, the column space has dimension at most n − 1 (after mean-centering), making the matrix singular and non-invertible. This breaks standard portfolio optimisation and GLS — regularisation (e.g. Ridge, shrinkage, PCA) is required.',
+    },
+    {
+      id: 23, category: 'Linear Algebra (QR)', track: 'qr',
+      title: 'Trace and Eigenvalues',
+      summary: 'A 3×3 matrix has eigenvalues 5, 3, 2 — what is its trace?',
+      source: 'Standard QR interview',
+      text: 'A 3×3 matrix has eigenvalues λ₁ = 5, λ₂ = 3, λ₃ = 2. What is its trace?',
+      options: ['6', '10', '30', 'Cannot be determined without the full matrix'],
+      answer: 1,
+      explanation: 'The trace of a matrix equals the sum of its eigenvalues: tr(A) = Σλᵢ = 5 + 3 + 2 = 10. This follows from tr(A) = tr(PDP⁻¹) = tr(D), where D is the diagonal eigenvalue matrix. Similarly, det(A) = product of eigenvalues = 5 × 3 × 2 = 30.',
+    },
+    {
+      id: 24, category: 'Linear Algebra (QR)', track: 'qr',
+      title: 'PCA — First Principal Component',
+      summary: 'What direction does the first principal component capture?',
+      source: 'Glassdoor / Teamblind (QR)',
+      text: 'In Principal Component Analysis (PCA), the first principal component is the direction that:',
+      options: [
+        'Minimises total variance in the projected data',
+        'Maximises variance in the projected data',
+        'Is parallel to the feature with the highest individual variance',
+        'Minimises reconstruction error only on training data',
+      ],
+      answer: 1,
+      explanation: 'The first PC is the eigenvector of the covariance matrix corresponding to its largest eigenvalue — the direction along which the projected data has maximum variance. Each subsequent PC is orthogonal to all prior PCs and explains the next-highest remaining variance. Equivalently, PCA is the rank-1 truncation of the SVD that minimises reconstruction error.',
+    },
+
+    // ---- Statistics (QR) ----------------------------------------
+    {
+      id: 25, category: 'Statistics (QR)', track: 'qr',
+      title: 'Gauss-Markov: OLS is BLUE when…',
+      summary: 'Under what error conditions is OLS the Best Linear Unbiased Estimator?',
+      source: 'Teamblind (QR)',
+      text: 'Ordinary Least Squares (OLS) is the Best Linear Unbiased Estimator (BLUE) when, among other conditions, the error terms are:',
+      options: [
+        'Normally distributed with any variance structure',
+        'Homoskedastic (equal variance) and uncorrelated across observations',
+        'Independent and identically distributed as any symmetric distribution',
+        'Zero-mean with any correlation structure',
+      ],
+      answer: 1,
+      explanation: 'The Gauss-Markov theorem requires: (1) linear model, (2) zero-mean errors, (3) homoskedasticity (constant σ²), and (4) no autocorrelation. Normality is NOT required for BLUE — only for exact F/t distributional results. When errors are heteroskedastic or autocorrelated, GLS is strictly more efficient than OLS.',
+    },
+    {
+      id: 26, category: 'Statistics (QR)', track: 'qr',
+      title: 'L1 vs L2 Regularisation',
+      summary: 'Why does Lasso produce sparse solutions while Ridge does not?',
+      source: 'Teamblind (QR)',
+      text: 'Compared to L2 (Ridge) regularisation, L1 (Lasso) regularisation in linear regression tends to:',
+      options: [
+        'Shrink all coefficients toward zero but rarely to exactly zero',
+        'Produce sparse solutions by setting some coefficients exactly to zero',
+        'Always outperform L2 when all predictors are correlated',
+        'Produce larger coefficients than unregularised OLS',
+      ],
+      answer: 1,
+      explanation: 'The L1 penalty (Σ|βⱼ|) is non-differentiable at zero. Geometrically, the L1 constraint region is a hypercube with corners on the coordinate axes — the optimum often sits at a corner, zeroing out some βⱼ. Ridge (L2: Σβⱼ²) has a smooth ellipsoidal constraint that shrinks all coefficients but almost never to exactly zero. Lasso is therefore preferred for feature selection.',
+    },
+    {
+      id: 27, category: 'Statistics (QR)', track: 'qr',
+      title: 'R² Always Increases with More Predictors',
+      summary: 'Why does adding any predictor — even noise — never decrease R²?',
+      source: 'Standard QR interview',
+      text: 'If you add a completely irrelevant predictor (pure random noise) to a multiple regression model, the in-sample R² will:',
+      options: [
+        'Always decrease — irrelevant predictors are penalised',
+        'Stay exactly the same',
+        'Increase or stay the same — it can never decrease',
+        'Change unpredictably',
+      ],
+      answer: 2,
+      explanation: 'R² = 1 − RSS/TSS. OLS minimises RSS, so adding any predictor allows OLS to keep the new coefficient at zero if useless, maintaining RSS. Therefore R² ≥ its previous value. This is why adjusted R² = 1 − (RSS/(n−p−1))/(TSS/(n−1)) penalises extra parameters and is preferred for model comparison.',
+    },
+    {
+      id: 28, category: 'Statistics (QR)', track: 'qr',
+      title: 'GLS vs OLS with Correlated Errors',
+      summary: 'When errors are correlated, does OLS stay unbiased? Is it still efficient?',
+      source: 'Teamblind (QR)',
+      text: 'When regression error terms are correlated across observations, which statement is correct?',
+      options: [
+        'OLS is biased when errors are correlated',
+        'OLS is unbiased but GLS achieves lower variance (is more efficient)',
+        'GLS and OLS produce identical estimates when errors are correlated',
+        'OLS remains BLUE — error correlation is irrelevant to efficiency',
+      ],
+      answer: 1,
+      explanation: 'OLS remains unbiased under correlated errors (E[β̂_OLS] = β as long as errors are mean-zero and uncorrelated with X). However, it is no longer BLUE. GLS pre-multiplies by Ω^{−1/2} (where Ω is the error covariance matrix), transforming the problem into one with i.i.d. errors. The GLS estimator achieves strictly lower variance by exploiting the known error structure.',
+    },
+
+    // ---- Stochastic Calculus & Derivatives (QR) -----------------
+    {
+      id: 29, category: 'Stochastic Calculus & Derivatives (QR)', track: 'qr',
+      title: 'Brownian Motion: E[W(t)²]',
+      summary: 'Standard Brownian motion — what is the expected squared value at time t?',
+      source: 'Glassdoor (QR)',
+      text: 'W(t) is a standard Brownian motion starting at W(0) = 0. What is E[W(t)²]?',
+      options: ['0', 't', 't²', '2t'],
+      answer: 1,
+      explanation: 'By definition W(t) ~ N(0, t), so E[W(t)] = 0 and Var(W(t)) = t. Therefore E[W(t)²] = Var(W(t)) + (E[W(t)])² = t + 0 = t. This is also why W(t)² − t is a martingale — a fact used directly in the Optional Stopping Theorem.',
+    },
+    {
+      id: 30, category: 'Stochastic Calculus & Derivatives (QR)', track: 'qr',
+      title: 'Call Option Delta',
+      summary: 'What are the bounds on the delta of a European call option?',
+      source: 'QuantNet / Glassdoor (QR)',
+      text: 'The Delta (∂C/∂S) of a European call option in the Black-Scholes model is always:',
+      options: [
+        'Between −1 and 0',
+        'Between 0 and 1',
+        'Between −1 and 1',
+        'Equal to exactly 1 for deep in-the-money calls',
+      ],
+      answer: 1,
+      explanation: 'In Black-Scholes, call Delta = N(d₁) where N is the standard normal CDF, so Delta ∈ (0, 1). It approaches 1 as the option becomes deep in-the-money (S ≫ K) and approaches 0 deep out-of-the-money. Note: deep ITM call Delta → 1 but never equals exactly 1 in continuous time.',
+    },
+    {
+      id: 31, category: 'Stochastic Calculus & Derivatives (QR)', track: 'qr',
+      title: "Itô's Lemma — Log of GBM",
+      summary: 'Apply Itô\'s Lemma to find the SDE for ln(S) under geometric Brownian motion.',
+      source: 'Glassdoor (QR)',
+      text: 'A stock follows dS = μS dt + σS dW (geometric Brownian motion). By Itô\'s Lemma, what is the SDE satisfied by ln(S)?',
+      options: [
+        'd(ln S) = μ dt + σ dW',
+        'd(ln S) = (μ − σ²/2) dt + σ dW',
+        'd(ln S) = (μ + σ²/2) dt + σ dW',
+        'd(ln S) = σ dW only (the drift cancels)',
+      ],
+      answer: 1,
+      explanation: "Apply Itô's Lemma to f(S) = ln S: df = f′(S)dS + ½f″(S)(dS)². With f′ = 1/S and f″ = −1/S², and noting (dS)² = σ²S²dt: d(ln S) = (1/S)·μS·dt + (1/S)·σS·dW + ½·(−1/S²)·σ²S²·dt = (μ − σ²/2)dt + σ dW. The −σ²/2 'Itô correction' arises because Brownian paths are non-differentiable.",
+    },
+    {
+      id: 32, category: 'Stochastic Calculus & Derivatives (QR)', track: 'qr',
+      title: 'Option Greeks — Vega',
+      summary: 'Vega measures option price sensitivity to which input?',
+      source: 'QuantNet / Glassdoor (QR)',
+      text: 'The Vega of an option (Greek letter ν) measures its price sensitivity to changes in:',
+      options: [
+        'The underlying asset price (same as Delta)',
+        'Time to expiration (same as Theta)',
+        'Implied volatility',
+        'The risk-free interest rate (same as Rho)',
+      ],
+      answer: 2,
+      explanation: 'Vega = ∂V/∂σ. Both calls and puts have positive Vega — higher volatility increases the probability of ending in-the-money for either side. Summary of Greeks: Delta = ∂V/∂S, Gamma = ∂²V/∂S², Theta = −∂V/∂t, Vega = ∂V/∂σ, Rho = ∂V/∂r.',
+    },
   ];
 
   const CATEGORIES = [
@@ -254,6 +430,9 @@
     'Conditional Probability & Bayes',
     'Large-Number & Combinatorics',
     'Distributions & Stochastic Processes',
+    'Linear Algebra (QR)',
+    'Statistics (QR)',
+    'Stochastic Calculus & Derivatives (QR)',
   ];
 
   // ================================================================
@@ -285,11 +464,13 @@
     if (!container) return;
 
     container.innerHTML = CATEGORIES.map(cat => {
-      const qs = QUESTIONS.filter(q => q.category === cat);
+      const qs    = QUESTIONS.filter(q => q.category === cat);
+      const isQR  = qs.length > 0 && qs[0].track === 'qr';
       return `
         <div class="prob-cat-block">
           <div class="section-header" style="margin-bottom:var(--space-sm)">
             <span class="label">${cat}</span>
+            ${isQR ? '<span class="prob-qr-badge">QR track</span>' : ''}
           </div>
           <ul class="prob-q-list">
             ${qs.map(q => `
@@ -466,7 +647,10 @@
     showSection('prob-list');
 
     const startBtn = $('prob-start-all');
-    if (startBtn) startBtn.onclick = startTest;
+    if (startBtn) {
+      startBtn.textContent = `Start Full Test — ${QUESTIONS.length} questions`;
+      startBtn.onclick = startTest;
+    }
 
     const backBtn = $('pq-back-btn');
     if (backBtn) backBtn.onclick = () => showSection('prob-list');

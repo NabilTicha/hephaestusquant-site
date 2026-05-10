@@ -2141,6 +2141,21 @@ code {
   margin-bottom: var(--space-xl);
 }
 
+.prob-qr-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.45rem;
+  border: 1px solid rgba(184, 156, 75, 0.3);
+  border-radius: 2px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  margin-left: var(--space-sm);
+  vertical-align: middle;
+}
+
 /* ---- Question list ---- */
 .prob-q-list {
   list-style: none;
