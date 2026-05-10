@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=6" />
+  <link rel="stylesheet" href="/styles.css?v=7" />
 </head>
 <body>
 
@@ -39,101 +39,100 @@
       <span class="label">HackerRank · Optiver OA</span>
       <h1>Coding Problems</h1>
       <p class="subtitle">
-        The Optiver online assessment (all technical roles) includes 3 coding problems
-        on HackerRank within a 2 hr 45 min window alongside math questions and games.
-        All three problems below are drawn directly from December 2025 OA reports.
+        The Optiver online assessment includes 3 coding problems on HackerRank within
+        a 2 hr 45 min window. All three problems below are drawn directly from
+        December 2025 OA reports.
       </p>
     </div>
 
     <div class="aside-block" style="margin-bottom:var(--space-xl)">
-      <p>Dynamic programming (Problem 2) is specifically flagged as the most time-consuming. Candidates recommend tackling Problems 1 and 3 first to secure those points, then spending remaining time on DP.</p>
+      <p>Dynamic programming (Problem 2) is the most time-consuming. Candidates recommend solving Problems 1 and 3 first, then spending remaining time on DP.</p>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-         PROBLEM 1 — Counting Trading Sequences
-         ══════════════════════════════════════════════════════════ -->
-    <article class="coding-problem">
+    <!-- ── PROBLEM 1 ──────────────────────────────────────────── -->
+    <article class="problem-block">
+      <header class="problem-header">
+        <span class="problem-id">
+          Problem 01
+          <span class="coding-sep">·</span>
+          Array / Fenwick Tree
+          <span class="coding-sep">·</span>
+          <span class="status status--warn">Medium</span>
+        </span>
+        <h3 class="problem-title">Counting Trading Sequences</h3>
+      </header>
 
-      <div class="coding-problem-meta">
-        <span class="coding-num">Problem 1</span>
-        <span class="coding-tag">Array · Fenwick Tree</span>
-        <span class="coding-diff coding-diff--medium">Medium</span>
-      </div>
-      <h2 class="coding-problem-title">Counting Trading Sequences</h2>
-      <p class="coding-problem-source">Confirmed — December 2025 OA · dev.to report</p>
+      <dl class="problem-meta">
+        <dt>Source</dt>
+        <dd>Confirmed — December 2025 OA · dev.to report</dd>
 
-      <div class="coding-body">
+        <dt>Statement</dt>
+        <dd>
+          Given a sequence of <em>n</em> stock prices (provided as decimal strings),
+          count all profitable trading pairs <code>(i, j)</code> such that
+          <code>i &lt; j</code> and <code>price[j] &gt; price[i]</code>.
+          Return the count modulo 10<sup>9</sup> + 7.
+        </dd>
 
-        <h4 class="coding-h4">Statement</h4>
-        <p>Given a sequence of <em>n</em> stock prices (provided as decimal strings), count all profitable trading pairs <code>(i, j)</code> such that:</p>
-        <ul class="coding-list">
-          <li><code>i &lt; j</code> — the buy day comes before the sell day</li>
-          <li><code>price[j] &gt; price[i]</code> — the sell price is strictly higher than the buy price</li>
-        </ul>
-        <p>Return the count modulo 10<sup>9</sup> + 7.</p>
+        <dt>Constraints</dt>
+        <dd>1 ≤ n ≤ 10<sup>5</sup> · prices given as decimal strings · time limit ~2 s</dd>
 
-        <h4 class="coding-h4">Constraints</h4>
-        <ul class="coding-list">
-          <li>1 ≤ n ≤ 10<sup>5</sup></li>
-          <li>Prices are given as decimal strings (e.g. <code>"3.14159265358979"</code>)</li>
-          <li>Time limit: ~2 seconds per test case</li>
-        </ul>
-
-        <h4 class="coding-h4">Example</h4>
-        <pre class="code-block">Input:  ["1.5", "3.0", "2.5", "4.0", "2.0"]
+        <dt>Example</dt>
+        <dd>
+          <pre class="code-block">Input:  ["1.5", "3.0", "2.5", "4.0", "2.0"]
 Output: 6
 
 Profitable pairs (buy_idx → sell_idx):
-  (0, 1)   1.5 → 3.0  ✓
-  (0, 2)   1.5 → 2.5  ✓
-  (0, 3)   1.5 → 4.0  ✓
-  (0, 4)   1.5 → 2.0  ✓
-  (1, 3)   3.0 → 4.0  ✓
-  (2, 3)   2.5 → 4.0  ✓
-  ——————————————————
-  Count = 6</pre>
+  (0,1)  1.5 → 3.0  ✓     (1,3)  3.0 → 4.0  ✓
+  (0,2)  1.5 → 2.5  ✓     (2,3)  2.5 → 4.0  ✓
+  (0,3)  1.5 → 4.0  ✓
+  (0,4)  1.5 → 2.0  ✓
+                           Count = 6</pre>
+        </dd>
+      </dl>
 
-        <details class="coding-detail coding-detail--warn">
-          <summary>⚠ Critical Pitfall — Floating-Point Precision</summary>
-          <div class="coding-detail-body">
-            <p>The most-reported failure mode: using Python's built-in <code>float()</code> for price comparisons causes approximately <strong>89% of test cases to fail</strong> when prices have many decimal places.</p>
-            <pre class="code-block"># ✗ WRONG — float loses precision at high decimal depth
+      <details class="coding-expand coding-expand--warn">
+        <summary>Pitfall — Floating-Point Precision</summary>
+        <div class="coding-expand-body">
+          <p>The most-reported failure mode: using Python's <code>float()</code> causes
+          approximately <strong>89 % of test cases to fail</strong> when prices have
+          many decimal places. Use <code>Decimal</code> instead.</p>
+          <pre class="code-block"># Wrong — float loses precision at high decimal depth
 prices = [float(p) for p in price_strings]
-# float("1.23456789012345") may round unexpectedly
 
-# ✓ CORRECT — Decimal guarantees exact decimal representation
+# Correct — Decimal stores the value exactly
 from decimal import Decimal
-prices = [Decimal(p) for p in price_strings]
-# Decimal("1.23456789012345") is stored exactly</pre>
-            <p>This is the single most common reason candidates score 0–30% on this problem despite correct logic.</p>
-          </div>
-        </details>
+prices = [Decimal(p) for p in price_strings]</pre>
+          <p>This single issue is why candidates with correct logic score 0–30 %.</p>
+        </div>
+      </details>
 
-        <details class="coding-detail">
-          <summary>💡 Algorithm — Brute Force vs Optimal</summary>
-          <div class="coding-detail-body">
-            <p><strong>Brute force O(n²):</strong> Two nested loops over all pairs. Correct, but TLEs for n = 10⁵.</p>
-            <pre class="code-block">def count_pairs_slow(prices):
+      <details class="coding-expand">
+        <summary>Hint — Brute Force vs Optimal</summary>
+        <div class="coding-expand-body">
+          <p><strong>Brute force O(n²):</strong> two nested loops — correct but times out for n = 10<sup>5</sup>.</p>
+          <pre class="code-block">def count_pairs_slow(prices):
     MOD, n, count = 10**9+7, len(prices), 0
     for i in range(n):
         for j in range(i+1, n):
             if prices[j] > prices[i]:
                 count = (count + 1) % MOD
     return count</pre>
-            <p><strong>Optimal O(n log n) — Fenwick Tree:</strong></p>
-            <p>For each index j, the problem reduces to: count how many elements to the left of j are strictly less than prices[j]. This is a classic "count smaller elements to the left" query, solved efficiently with a Binary Indexed Tree after coordinate compression:</p>
-            <ol class="coding-list coding-list--ol">
-              <li>Collect all unique Decimal prices and sort them. Assign integer ranks 1, 2, …, k.</li>
-              <li>Process prices left to right. For price at rank r: query BIT for prefix sum up to r−1 (count of prices seen so far that are strictly less than the current price).</li>
-              <li>Add result to running count (mod 10⁹+7). Update BIT at rank r.</li>
-            </ol>
-          </div>
-        </details>
+          <p><strong>Optimal O(n log n) — Fenwick Tree:</strong> for each index j, count
+          how many elements to its left are strictly less than <code>price[j]</code>.
+          This is the classic "count smaller to the left" query.</p>
+          <ol class="coding-list coding-list--ol">
+            <li>Sort all unique Decimal prices and assign integer ranks 1, 2, …, k.</li>
+            <li>Iterate left to right. For price at rank r: query BIT for prefix sum up to r−1.</li>
+            <li>Accumulate (mod 10⁹+7). Update BIT at rank r.</li>
+          </ol>
+        </div>
+      </details>
 
-        <details class="coding-detail">
-          <summary>📖 Reference Solution (Python)</summary>
-          <div class="coding-detail-body">
-            <pre class="code-block">from decimal import Decimal
+      <details class="coding-expand">
+        <summary>Solution — Python Reference</summary>
+        <div class="coding-expand-body">
+          <pre class="code-block">from decimal import Decimal
 from typing import List
 
 MOD = 10**9 + 7
@@ -151,328 +150,266 @@ def _query(bit: list, i: int) -> int:
     return s
 
 def count_profitable_pairs(price_strings: List[str]) -> int:
-    # Critical: Decimal, not float
-    prices = [Decimal(p) for p in price_strings]
-
-    # Coordinate compression
+    prices = [Decimal(p) for p in price_strings]   # Critical: Decimal
     sorted_unique = sorted(set(prices))
     rank = {v: i + 1 for i, v in enumerate(sorted_unique)}
     m = len(sorted_unique)
-
     bit = [0] * (m + 2)
     result = 0
-
     for p in prices:
         r = rank[p]
-        # Count previously seen prices strictly less than p
         result = (result + _query(bit, r - 1)) % MOD
         _update(bit, r, m)
-
     return result
 
-# ── Test ──────────────────────────────────────────────────────
 assert count_profitable_pairs(["1.5","3.0","2.5","4.0","2.0"]) == 6
-assert count_profitable_pairs(["5.0","4.0","3.0","2.0","1.0"]) == 0  # Strictly decreasing
-assert count_profitable_pairs(["1.0","2.0","3.0","4.0","5.0"]) == 10 # C(5,2) = 10</pre>
-          </div>
-        </details>
-
-      </div>
+assert count_profitable_pairs(["5.0","4.0","3.0","2.0","1.0"]) == 0
+assert count_profitable_pairs(["1.0","2.0","3.0","4.0","5.0"]) == 10</pre>
+        </div>
+      </details>
     </article>
 
-    <!-- ══════════════════════════════════════════════════════════
-         PROBLEM 2 — Dynamic Programming
-         ══════════════════════════════════════════════════════════ -->
-    <article class="coding-problem">
+    <!-- ── PROBLEM 2 ──────────────────────────────────────────── -->
+    <article class="problem-block">
+      <header class="problem-header">
+        <span class="problem-id">
+          Problem 02
+          <span class="coding-sep">·</span>
+          Dynamic Programming / State Machine
+          <span class="coding-sep">·</span>
+          <span class="status status--danger">Hard</span>
+        </span>
+        <h3 class="problem-title">Maximum Profit with Cooldown</h3>
+      </header>
 
-      <div class="coding-problem-meta">
-        <span class="coding-num">Problem 2</span>
-        <span class="coding-tag">Dynamic Programming · State Machine</span>
-        <span class="coding-diff coding-diff--hard">Hard</span>
-      </div>
-      <h2 class="coding-problem-title">Maximum Profit with Cooldown</h2>
-      <p class="coding-problem-source">Representative DP — December 2025 OA · Linkjob / Glassdoor</p>
+      <dl class="problem-meta">
+        <dt>Source</dt>
+        <dd>
+          Representative DP — December 2025 OA · Linkjob / Glassdoor.
+          The exact DP problem varies between cohorts; this is the most widely reported
+          form and illustrates the state-transition technique confirmed in every account.
+        </dd>
 
-      <div class="coding-body">
+        <dt>Statement</dt>
+        <dd>
+          Given an array of daily stock prices, find the maximum profit. You may buy
+          and sell as many times as you like, but you must sell before buying again, and
+          after each sale you must wait <strong>one full cooldown day</strong> before
+          buying.
+        </dd>
 
-        <div class="aside-block" style="margin:0 0 var(--space-md)">
-          <p>The exact DP problem varies between cohorts. This is the most widely reported form, and it perfectly illustrates the state-transition modelling technique described in every account.</p>
-        </div>
+        <dt>Constraints</dt>
+        <dd>1 ≤ n ≤ 5 × 10<sup>3</sup> · 0 ≤ prices[i] ≤ 10<sup>4</sup></dd>
 
-        <h4 class="coding-h4">Statement</h4>
-        <p>Given an array of daily stock prices, find the maximum profit you can achieve. You may complete as many transactions as you like (buy then sell), but:</p>
-        <ul class="coding-list">
-          <li>You must sell the stock before buying again (no holding two positions)</li>
-          <li>After each sale, you must wait <strong>one full cooldown day</strong> before buying again</li>
-        </ul>
-
-        <h4 class="coding-h4">Constraints</h4>
-        <ul class="coding-list">
-          <li>1 ≤ n ≤ 5 × 10<sup>3</sup></li>
-          <li>0 ≤ prices[i] ≤ 10<sup>4</sup></li>
-        </ul>
-
-        <h4 class="coding-h4">Example</h4>
-        <pre class="code-block">Input:  prices = [1, 2, 3, 0, 2]
+        <dt>Example</dt>
+        <dd>
+          <pre class="code-block">Input:  [1, 2, 3, 0, 2]
 Output: 3
 
-Optimal strategy:
-  Day 0: Buy  @ 1
-  Day 1: Sell @ 2  (+1)  →  Day 2 is cooldown
-  Day 3: Buy  @ 0
-  Day 4: Sell @ 2  (+2)
-  Total profit = 3</pre>
+Day 0: Buy  @ 1
+Day 1: Sell @ 2  → +1    (Day 2 is cooldown)
+Day 3: Buy  @ 0
+Day 4: Sell @ 2  → +2
+               Total = 3</pre>
+        </dd>
+      </dl>
 
-        <details class="coding-detail">
-          <summary>💡 State Machine DP</summary>
-          <div class="coding-detail-body">
-            <p>The cooldown constraint means we cannot use a greedy approach. Define three states for each day i:</p>
-            <ul class="coding-list">
-              <li><strong>HOLD(i)</strong>: maximum profit when holding stock on day i</li>
-              <li><strong>SOLD(i)</strong>: maximum profit when we just sold on day i (cooldown follows)</li>
-              <li><strong>REST(i)</strong>: maximum profit when not holding, not in cooldown on day i</li>
-            </ul>
-            <p><strong>Transitions:</strong></p>
-            <pre class="code-block">HOLD(i) = max(HOLD(i-1),          # Keep holding
-              REST(i-1) - price[i]) # Buy today (only from REST state)
+      <details class="coding-expand">
+        <summary>Hint — State Machine DP</summary>
+        <div class="coding-expand-body">
+          <p>The cooldown constraint rules out a greedy approach. Define three states at each day i:</p>
+          <ul class="coding-list">
+            <li><strong>HOLD(i)</strong> — maximum profit while holding stock on day i</li>
+            <li><strong>SOLD(i)</strong> — maximum profit having just sold on day i</li>
+            <li><strong>REST(i)</strong> — maximum profit when free to buy (not in cooldown)</li>
+          </ul>
+          <pre class="code-block">HOLD(i) = max(HOLD(i−1), REST(i−1) − price[i])   # hold or buy
+SOLD(i) = HOLD(i−1) + price[i]                    # sell today
+REST(i) = max(REST(i−1), SOLD(i−1))               # rest or end cooldown
 
-SOLD(i) = HOLD(i-1) + price[i]   # Sell today
+Init:  HOLD(0) = −price[0],  SOLD(0) = 0,  REST(0) = 0
+Answer: max(SOLD[n−1], REST[n−1])</pre>
+          <p>O(n) time, O(1) space — keep only the previous day's values.</p>
+        </div>
+      </details>
 
-REST(i) = max(REST(i-1),          # Stay resting
-              SOLD(i-1))           # Cooldown day just ended</pre>
-            <p><strong>Initial conditions (day 0):</strong><br>
-            HOLD(0) = −prices[0], SOLD(0) = 0, REST(0) = 0</p>
-            <p><strong>Answer:</strong> max(SOLD[n−1], REST[n−1])  — never end while holding</p>
-            <p>This runs in O(n) time and O(1) space (keep only previous day's values).</p>
-          </div>
-        </details>
+      <details class="coding-expand">
+        <summary>Trace — prices = [1, 2, 3, 0, 2]</summary>
+        <div class="coding-expand-body">
+          <pre class="code-block">Day  price   HOLD              SOLD              REST
+ 0     1     −1                0                 0
+ 1     2     max(−1, 0−2)=−1   −1+2 = 1          max(0, 0)=0
+ 2     3     max(−1, 0−3)=−1   −1+3 = 2          max(0, 1)=1
+ 3     0     max(−1, 1−0)= 1   −1+0 =−1          max(1, 2)=2
+ 4     2     max( 1, 2−2)= 1    1+2 = 3          max(2,−1)=2
 
-        <details class="coding-detail">
-          <summary>🔍 Worked Trace — prices = [1, 2, 3, 0, 2]</summary>
-          <div class="coding-detail-body">
-            <pre class="code-block">Day | price | HOLD          | SOLD            | REST
- 0  |   1   | max(−∞, 0−1) = −1 | 0          | 0
- 1  |   2   | max(−1, 0−2) = −1 | −1+2 = 1  | max(0, 0) = 0
- 2  |   3   | max(−1, 0−3) = −1 | −1+3 = 2  | max(0, 1) = 1
- 3  |   0   | max(−1, 1−0) =  1 | −1+0 = −1 | max(1, 2) = 2
- 4  |   2   | max( 1, 2−2) =  1 | 1+2  =  3 | max(2,−1) = 2
+Answer: max(SOLD[4], REST[4]) = max(3, 2) = 3  ✓</pre>
+        </div>
+      </details>
 
-Answer: max(SOLD[4], REST[4]) = max(3, 2) = 3 ✓</pre>
-          </div>
-        </details>
-
-        <details class="coding-detail">
-          <summary>📖 Reference Solution (Python)</summary>
-          <div class="coding-detail-body">
-            <pre class="code-block">from typing import List
+      <details class="coding-expand">
+        <summary>Solution — Python Reference</summary>
+        <div class="coding-expand-body">
+          <pre class="code-block">from typing import List
 
 def max_profit_with_cooldown(prices: List[int]) -> int:
     if len(prices) < 2:
         return 0
-
-    hold = -prices[0]   # Profit when holding stock
-    sold =  0           # Profit on the day we just sold
-    rest =  0           # Profit when free to buy (not in cooldown)
-
+    hold = -prices[0]
+    sold =  0
+    rest =  0
     for price in prices[1:]:
-        prev_hold, prev_sold, prev_rest = hold, sold, rest
+        hold, sold, rest = (
+            max(hold, rest - price),
+            hold + price,
+            max(rest, sold),
+        )
+    return max(sold, rest)
 
-        hold = max(prev_hold, prev_rest - price)  # Hold or buy today
-        sold = prev_hold + price                   # Sell today
-        rest = max(prev_rest, prev_sold)           # Rest or end cooldown
-
-    return max(sold, rest)  # Never beneficial to end while holding
-
-# ── Tests ─────────────────────────────────────────────────────
 assert max_profit_with_cooldown([1, 2, 3, 0, 2]) == 3
 assert max_profit_with_cooldown([1])              == 0
 assert max_profit_with_cooldown([1, 2])           == 1
-assert max_profit_with_cooldown([2, 1])           == 0  # Falling prices</pre>
-          </div>
-        </details>
-
-      </div>
+assert max_profit_with_cooldown([2, 1])           == 0</pre>
+        </div>
+      </details>
     </article>
 
-    <!-- ══════════════════════════════════════════════════════════
-         PROBLEM 3 — Order Book Simulation
-         ══════════════════════════════════════════════════════════ -->
-    <article class="coding-problem">
+    <!-- ── PROBLEM 3 ──────────────────────────────────────────── -->
+    <article class="problem-block">
+      <header class="problem-header">
+        <span class="problem-id">
+          Problem 03
+          <span class="coding-sep">·</span>
+          Simulation / Heap
+          <span class="coding-sep">·</span>
+          <span class="status status--warn">Medium</span>
+        </span>
+        <h3 class="problem-title">Order Book Simulation</h3>
+      </header>
 
-      <div class="coding-problem-meta">
-        <span class="coding-num">Problem 3</span>
-        <span class="coding-tag">Simulation · Heap</span>
-        <span class="coding-diff coding-diff--medium">Medium</span>
-      </div>
-      <h2 class="coding-problem-title">Order Book Simulation</h2>
-      <p class="coding-problem-source">Confirmed — Multiple cohorts · dev.to / Glassdoor</p>
+      <dl class="problem-meta">
+        <dt>Source</dt>
+        <dd>Confirmed across multiple cohorts — dev.to / Glassdoor. The most trading-specific problem on the OA and the most consistently reported.</dd>
 
-      <div class="coding-body">
+        <dt>Statement</dt>
+        <dd>
+          Process a stream of buy and sell limit orders for a single security and simulate
+          a two-sided order book. Each order has a type, a limit price, and a quantity.
+          Return all orders that remain unmatched after the full sequence is processed.
+        </dd>
 
-        <h4 class="coding-h4">Statement</h4>
-        <p>Process a sequence of buy and sell orders for a single security and simulate a two-sided order book. Each order has a type, a limit price, and a size. Return all unmatched orders after processing the entire sequence.</p>
+        <dt>Matching rules</dt>
+        <dd>
+          <ul class="coding-list">
+            <li><strong>BUY</strong> — matches the cheapest available sell at or below the buy limit.</li>
+            <li><strong>SELL</strong> — matches the most expensive available buy at or above the sell limit.</li>
+            <li><strong>FIFO</strong> — among orders at the same price, earlier orders match first.</li>
+            <li><strong>Partial fills</strong> — the unmatched remainder stays in the book.</li>
+          </ul>
+        </dd>
 
-        <h4 class="coding-h4">Matching Rules</h4>
-        <ul class="coding-list">
-          <li><strong>BUY order:</strong> matches with the <em>cheapest available sell</em> at or below the buy limit price.</li>
-          <li><strong>SELL order:</strong> matches with the <em>most expensive available buy</em> at or above the sell limit price.</li>
-          <li><strong>FIFO within a price level:</strong> among orders at the same price, earlier orders match first.</li>
-          <li><strong>Partial fills are supported:</strong> if matched quantity &lt; order size, the remainder stays in the book.</li>
-        </ul>
-
-        <h4 class="coding-h4">Input / Output Format</h4>
-        <pre class="code-block">Input:   list of [type, price, size]
-         type  ∈ {"BUY", "SELL"}
-         price, size are positive integers
-
-Output:  list of [type, price, remaining_size]
-         (unmatched orders, sorted by price ascending for sells,
-          price descending for buys — or insertion order)</pre>
-
-        <h4 class="coding-h4">Worked Example</h4>
-        <pre class="code-block">Orders (in sequence):
-  1. BUY  102  10    Buy up to 102, quantity 10
-  2. SELL 101   5    Sell at 101+, quantity 5
-  3. BUY  103   3    Buy up to 103, quantity 3
-  4. SELL 105   8    Sell at 105+, quantity 8
-  5. SELL 100  15    Sell at 100+, quantity 15
+        <dt>Worked example</dt>
+        <dd>
+          <pre class="code-block">Input:
+  BUY  102  10     BUY  103   3     SELL 100  15
+  SELL 101   5     SELL 105   8
 
 Step-by-step:
-  1. BUY 102@10   No sells ≤ 102 in book. → Book: buys={102:[10]}
-  2. SELL 101@5   Best buy ≥ 101 = 102 (qty 10). Match 5. → Book: buys={102:[5]}
-  3. BUY 103@3    No sells ≤ 103.              → Book: buys={103:[3], 102:[5]}
-  4. SELL 105@8   Best buy ≥ 105: none (max buy=103).
-                  → Book: buys={103:[3], 102:[5]}, sells={105:[8]}
-  5. SELL 100@15  Best buy ≥ 100 = 103 (qty 3). Match 3. Remaining sell = 12.
-                  Next buy ≥ 100 = 102 (qty 5). Match 5. Remaining sell = 7.
-                  No more buys.
-                  → Book: buys={}, sells={100:[7], 105:[8]}
+  BUY 102@10   No sells ≤ 102.          Book: buys={102:10}
+  SELL 101@5   Best buy ≥ 101 = 102.    Match 5.   Book: buys={102:5}
+  BUY 103@3    No sells ≤ 103.          Book: buys={103:3, 102:5}
+  SELL 105@8   No buys ≥ 105.           Book: buys={103:3, 102:5}, sells={105:8}
+  SELL 100@15  Match 103→qty 3 (rem 12), match 102→qty 5 (rem 7), no more buys.
+               Book: buys={}, sells={100:7, 105:8}
 
 Output: [("SELL", 100, 7), ("SELL", 105, 8)]</pre>
+        </dd>
+      </dl>
 
-        <details class="coding-detail">
-          <summary>💡 Data Structure Choice</summary>
-          <div class="coding-detail-body">
-            <p>Two heaps drive the matching engine:</p>
-            <ul class="coding-list">
-              <li><strong>Sell side — min-heap:</strong> always pop the cheapest sell first. Key: <code>(price, insertion_time)</code></li>
-              <li><strong>Buy side — max-heap:</strong> always pop the most expensive buy first. Key: <code>(-price, insertion_time)</code> (negate price for max-heap via Python's min-heap)</li>
-            </ul>
-            <p>Because heaps don't support in-place updates, use <strong>lazy deletion</strong>: track remaining size in a dictionary keyed by insertion time; skip heap entries whose remaining size has been reduced to zero.</p>
-            <p><strong>FIFO at same price:</strong> the <code>insertion_time</code> (order sequence number) in the heap key ensures that among equal-price orders, earlier ones are popped first.</p>
-          </div>
-        </details>
+      <details class="coding-expand">
+        <summary>Hint — Data Structures</summary>
+        <div class="coding-expand-body">
+          <p>Two priority queues drive the matching engine:</p>
+          <ul class="coding-list">
+            <li><strong>Sell side — min-heap:</strong> key <code>(price, insertion_time)</code> — always pops the cheapest sell first.</li>
+            <li><strong>Buy side — max-heap:</strong> key <code>(-price, insertion_time)</code> — always pops the most expensive buy first.</li>
+          </ul>
+          <p>Heaps don't support in-place updates, so use <strong>lazy deletion</strong>: store remaining quantities in a <code>dict[insertion_time → remaining]</code>; skip any heap entry whose remaining quantity has been reduced to zero by an earlier partial fill.</p>
+          <p>The <code>insertion_time</code> tie-breaks equal prices in arrival order, enforcing FIFO.</p>
+        </div>
+      </details>
 
-        <details class="coding-detail">
-          <summary>📖 Reference Solution (Python)</summary>
-          <div class="coding-detail-body">
-            <pre class="code-block">import heapq
+      <details class="coding-expand">
+        <summary>Solution — Python Reference</summary>
+        <div class="coding-expand-body">
+          <pre class="code-block">import heapq
 from typing import List, Tuple
 
 def simulate_order_book(
     orders: List[Tuple[str, int, int]]
 ) -> List[Tuple[str, int, int]]:
-    """
-    Returns unmatched orders in the sequence they were added to the book.
-    """
-    # Heaps store (sort_key, insertion_time)
-    sell_heap: list = []  # min-heap: (price, time)
-    buy_heap:  list = []  # max-heap: (-price, time)
-
-    sell_rem: dict[int, int] = {}  # insertion_time -> remaining size
-    buy_rem:  dict[int, int] = {}
-
-    t = 0  # Monotonic insertion clock
+    sell_heap: list = []          # min-heap (price, time)
+    buy_heap:  list = []          # max-heap (-price, time)
+    sell_rem:  dict[int,int] = {}
+    buy_rem:   dict[int,int] = {}
+    t = 0
 
     for order_type, price, size in orders:
         remaining = size
 
         if order_type == "BUY":
-            # Match against cheapest sells with price ≤ buy limit
             while remaining > 0 and sell_heap:
                 sp, st = sell_heap[0]
-                if sp > price:
-                    break
-                if sell_rem.get(st, 0) == 0:    # Stale entry
-                    heapq.heappop(sell_heap)
-                    continue
+                if sp > price: break
+                if sell_rem.get(st, 0) == 0:
+                    heapq.heappop(sell_heap); continue
                 heapq.heappop(sell_heap)
                 fill = min(remaining, sell_rem[st])
-                remaining        -= fill
-                sell_rem[st]     -= fill
-                if sell_rem[st] > 0:             # Partial fill — reinsert
+                remaining -= fill; sell_rem[st] -= fill
+                if sell_rem[st] > 0:
                     heapq.heappush(sell_heap, (sp, st))
-
             if remaining > 0:
                 buy_rem[t] = remaining
                 heapq.heappush(buy_heap, (-price, t))
 
-        else:  # SELL
-            # Match against most expensive buys with price ≥ sell limit
+        else:
             while remaining > 0 and buy_heap:
                 nbp, bt = buy_heap[0]
-                bp = -nbp
-                if bp < price:
-                    break
+                if -nbp < price: break
                 if buy_rem.get(bt, 0) == 0:
-                    heapq.heappop(buy_heap)
-                    continue
+                    heapq.heappop(buy_heap); continue
                 heapq.heappop(buy_heap)
                 fill = min(remaining, buy_rem[bt])
-                remaining      -= fill
-                buy_rem[bt]    -= fill
+                remaining -= fill; buy_rem[bt] -= fill
                 if buy_rem[bt] > 0:
                     heapq.heappush(buy_heap, (nbp, bt))
-
             if remaining > 0:
                 sell_rem[t] = remaining
                 heapq.heappush(sell_heap, (price, t))
-
         t += 1
 
-    # Collect unmatched orders in insertion order
-    result = []
-    seen = set()
-
+    result, seen = [], set()
     for sp, st in sorted(sell_heap):
         if st not in seen and sell_rem.get(st, 0) > 0:
-            seen.add(st)
-            result.append(("SELL", sp, sell_rem[st]))
-
+            seen.add(st); result.append(("SELL", sp, sell_rem[st]))
     for nbp, bt in sorted(buy_heap):
         if bt not in seen and buy_rem.get(bt, 0) > 0:
-            seen.add(bt)
-            result.append(("BUY", -nbp, buy_rem[bt]))
+            seen.add(bt); result.append(("BUY", -nbp, buy_rem[bt]))
+    return result</pre>
+        </div>
+      </details>
 
-    return result
-
-# ── Test ──────────────────────────────────────────────────────
-orders = [
-    ("BUY",  102, 10),
-    ("SELL", 101,  5),
-    ("BUY",  103,  3),
-    ("SELL", 105,  8),
-    ("SELL", 100, 15),
-]
-result = simulate_order_book(orders)
-# Expected: SELL 100@7, SELL 105@8
-print(result)  # [('SELL', 100, 7), ('SELL', 105, 8)]</pre>
-          </div>
-        </details>
-
-        <details class="coding-detail">
-          <summary>🔍 Edge Cases to Handle</summary>
-          <div class="coding-detail-body">
-            <ul class="coding-list">
-              <li><strong>Exact price match:</strong> A BUY at 100 should match a SELL at exactly 100 (<code>sell_price ≤ buy_limit</code>).</li>
-              <li><strong>Partial fill leaving a remainder:</strong> After a partial match, the unmatched portion must re-enter the book at the same price and same FIFO position.</li>
-              <li><strong>Multiple price levels crossed:</strong> A large order can match across several price levels in one step (see step 5 of the example above).</li>
-              <li><strong>Stale heap entries:</strong> After a partial fill, an entry may remain in the heap with an outdated size. Always check the remaining-size dictionary before using a popped entry.</li>
-            </ul>
-          </div>
-        </details>
-
-      </div>
+      <details class="coding-expand">
+        <summary>Edge Cases</summary>
+        <div class="coding-expand-body">
+          <ul class="coding-list">
+            <li><strong>Exact price match</strong> — BUY at 100 must match a SELL at exactly 100 (<code>sell_price ≤ buy_limit</code>).</li>
+            <li><strong>Partial fill re-entry</strong> — remaining quantity re-enters the book at the same price and FIFO position.</li>
+            <li><strong>Multi-level sweep</strong> — a large order can cross several price levels in a single step (see order 5 in the example).</li>
+            <li><strong>Stale heap entries</strong> — always validate against the remaining-size dict before using a popped entry.</li>
+          </ul>
+        </div>
+      </details>
     </article>
 
   </main>

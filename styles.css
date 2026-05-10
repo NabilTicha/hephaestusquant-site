@@ -2406,217 +2406,116 @@ code {
    Coding Problems
    ================================================ */
 
-.coding-problem {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-xl);
-  transition: border-color 0.25s;
-}
-
-.coding-problem:hover {
-  border-color: rgba(184, 156, 75, 0.14);
-}
-
-/* ---- Problem header ---- */
-.coding-problem-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: 0.5rem;
-}
-
-.coding-num {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.coding-tag {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  color: var(--text-secondary);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  padding: 0.1rem 0.45rem;
-  border-radius: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.coding-diff {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.coding-diff--medium {
-  color: #d69e2e;
-  background: rgba(214, 158, 46, 0.1);
-  border: 1px solid rgba(214, 158, 46, 0.25);
-}
-
-.coding-diff--hard {
-  color: #e53e3e;
-  background: rgba(229, 62, 62, 0.1);
-  border: 1px solid rgba(229, 62, 62, 0.25);
-}
-
-.coding-problem-title {
-  font-family: var(--font-mono);
-  font-size: clamp(1.1rem, 3vw, 1.5rem);
-  font-weight: 400;
-  color: var(--text-heading);
-  margin-bottom: 0.25rem;
-  letter-spacing: -0.02em;
-}
-
-.coding-problem-source {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
+/* Separator between tags in problem-id line */
+.coding-sep {
   color: var(--muted);
-  margin-bottom: var(--space-md);
+  margin: 0 0.1em;
 }
 
-/* ---- Body content ---- */
-.coding-body {
-  margin-top: var(--space-sm);
+/* Status variants for difficulty labels */
+.status--warn {
+  border-color: rgba(214, 158, 46, 0.32);
+  color: #d69e2e;
+  background: rgba(214, 158, 46, 0.08);
 }
 
-.coding-h4 {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--accent);
-  margin: var(--space-md) 0 var(--space-xs);
-}
-
-.coding-body > .coding-h4:first-child {
-  margin-top: 0;
-}
-
-.coding-list {
-  margin: 0 0 var(--space-sm) var(--space-md);
-  font-size: 0.88rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.coding-list li { margin-bottom: 0.2rem; }
-
-.coding-list--ol {
-  list-style: decimal;
+.status--danger {
+  border-color: rgba(229, 62, 62, 0.32);
+  color: #e53e3e;
+  background: rgba(229, 62, 62, 0.08);
 }
 
 /* ---- Code blocks ---- */
 .code-block {
-  background: #0B0D10;
+  display: block;
+  background: var(--bg);
   border: 1px solid rgba(184, 156, 75, 0.12);
-  border-radius: 4px;
+  border-radius: 3px;
   padding: var(--space-sm) var(--space-md);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   line-height: 1.65;
-  color: #ccccd4;
+  color: var(--text);
   white-space: pre;
-  margin: var(--space-sm) 0;
+  margin: var(--space-xs) 0 var(--space-sm);
 }
 
-/* ---- Expandable details ---- */
-.coding-detail {
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  margin-top: var(--space-sm);
-  overflow: hidden;
+/* ---- Lists inside problem-meta dd ---- */
+.coding-list {
+  margin: 0.4rem 0 0 var(--space-md);
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.7;
 }
 
-.coding-detail[open] {
-  border-color: var(--border-strong);
+.coding-list li { margin-bottom: 0.2rem; }
+.coding-list--ol { list-style: decimal; }
+
+/* ---- Expandable sections ---- */
+.coding-expand {
+  border-top: 1px solid var(--border);
 }
 
-.coding-detail--warn {
-  border-color: rgba(229, 62, 62, 0.2);
+.coding-expand + .coding-expand {
+  border-top-color: var(--border);
 }
 
-.coding-detail--warn[open] {
-  border-color: rgba(229, 62, 62, 0.35);
+/* First expand after the dl */
+.problem-meta + .coding-expand,
+.coding-expand:first-of-type {
+  margin-top: var(--space-md);
+  border-top-color: var(--border-strong);
 }
 
-.coding-detail summary {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  padding: 0.65rem var(--space-md);
+.coding-expand summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
   cursor: pointer;
   user-select: none;
   list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: var(--bg);
-  transition: background 0.15s;
-}
-
-.coding-detail summary::-webkit-details-marker { display: none; }
-
-.coding-detail summary::after {
-  content: '›';
-  margin-left: auto;
-  font-size: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
   color: var(--muted);
-  transition: transform 0.2s;
+  transition: color 0.15s;
 }
 
-.coding-detail[open] summary::after {
-  transform: rotate(90deg);
+.coding-expand summary::-webkit-details-marker { display: none; }
+
+.coding-expand summary::after {
+  content: '+';
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-left: var(--space-sm);
 }
 
-.coding-detail summary:hover {
-  background: var(--surface);
-  color: var(--text-heading);
-}
+.coding-expand[open] summary::after { content: '−'; }
 
-.coding-detail--warn summary {
-  color: #e53e3e;
-}
+.coding-expand summary:hover        { color: var(--text-secondary); }
+.coding-expand[open] summary        { color: var(--accent); }
 
-.coding-detail-body {
-  padding: var(--space-sm) var(--space-md) var(--space-md);
-  border-top: 1px solid var(--border);
+/* Warning variant — pitfall sections */
+.coding-expand--warn[open] summary  { color: #d69e2e; }
+
+.coding-expand-body {
+  padding: 0 0 var(--space-md);
   font-size: 0.88rem;
   line-height: 1.7;
   color: var(--text-secondary);
 }
 
-.coding-detail-body p + p {
-  margin-top: var(--space-sm);
-}
-
-.coding-detail-body code {
-  font-size: 0.83em;
-}
+.coding-expand-body p       { max-width: 680px; }
+.coding-expand-body p + p   { margin-top: var(--space-sm); }
+.coding-expand-body strong  { color: var(--text-heading); }
 
 /* ---- Responsive ---- */
 @media (max-width: 600px) {
-  .coding-problem {
-    padding: var(--space-sm) var(--space-md);
-  }
-
-  .coding-problem-meta {
-    flex-wrap: wrap;
-  }
-
-  .code-block {
-    font-size: 0.72rem;
-    padding: var(--space-sm);
-  }
+  .code-block { font-size: 0.7rem; padding: var(--space-sm); }
 }
 
