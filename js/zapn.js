@@ -41,42 +41,70 @@
 
       function render() {
         el.innerHTML = `
-          <div class="zapn-sm-wrap">
-            <div class="zapn-sm-meta">Round <span id="sm-r">${round + 1}</span> / ${ROUNDS}</div>
-            <div class="zapn-sm-outer" id="sm-outer">
-              <div class="zapn-sm-track">
-                <div class="zapn-sm-zone" id="sm-zone"></div>
-                <div class="zapn-sm-fill" id="sm-fill"></div>
-              </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-mono);font-size:0.78rem;color:var(--muted);margin-bottom:1rem">
+              Round <span id="sm-r">${round + 1}</span> / ${ROUNDS}
             </div>
-            <p class="zapn-sm-click-prompt">Click the track when the bar reaches the green zone</p>
-            <div class="zapn-sm-score">Score: <span id="sm-total">${total}</span> / ${ROUNDS * 100}</div>
+            <canvas id="sm-canvas" width="110" height="300"
+              style="cursor:pointer;display:block;margin:0 auto;border-radius:6px"></canvas>
+            <p style="font-size:0.8rem;color:var(--text-secondary);margin:0.75rem 0 0.25rem">
+              Click when the bar enters the green zone
+            </p>
+            <div style="font-family:var(--font-mono);font-size:0.82rem;color:var(--text-secondary)">
+              Score: <span id="sm-total">${total}</span> / ${ROUNDS * 100}
+            </div>
             <div id="sm-fb" class="zapn-feedback"></div>
           </div>`;
         runRound();
       }
 
       function runRound() {
-        const outer = $('sm-outer');
-        const zone  = $('sm-zone');
-        const fill  = $('sm-fill');
+        const canvas = document.getElementById('sm-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
         const fb    = $('sm-fb');
 
-        // Zone defined from bottom (same coordinate system as fill height)
         const zS  = 0.22 + Math.random() * 0.30;
         const zE  = Math.min(zS + 0.14 + Math.random() * 0.12, 0.88);
-        const dur = 2400 + Math.random() * 2000;
-
-        zone.style.bottom = `${zS * 100}%`;
-        zone.style.height = `${(zE - zS) * 100}%`;
-        fill.style.height = '0%';
+        const dur = 2500 + Math.random() * 2000;
 
         let prog = 0, t0 = null, animId, clicked = false;
+
+        function draw() {
+          ctx.clearRect(0, 0, W, H);
+          // track background
+          ctx.fillStyle = '#111318';
+          ctx.roundRect ? ctx.roundRect(0, 0, W, H, 6) : ctx.rect(0, 0, W, H);
+          ctx.fill();
+          // border
+          ctx.strokeStyle = 'rgba(184,156,75,0.25)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          // green zone (measured from bottom)
+          const zoneY = H - zE * H;
+          const zoneH = (zE - zS) * H;
+          ctx.fillStyle = 'rgba(56,161,105,0.28)';
+          ctx.fillRect(0, zoneY, W, zoneH);
+          ctx.strokeStyle = '#38a169';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(0, zoneY);       ctx.lineTo(W, zoneY);
+          ctx.moveTo(0, zoneY + zoneH); ctx.lineTo(W, zoneY + zoneH);
+          ctx.stroke();
+          // fill bar rising from bottom
+          const fillH = prog * H;
+          const grad = ctx.createLinearGradient(0, H - fillH, 0, H);
+          grad.addColorStop(0, '#C2A75E');
+          grad.addColorStop(1, '#8A6F2A');
+          ctx.fillStyle = grad;
+          ctx.fillRect(12, H - fillH, W - 24, fillH);
+        }
 
         function frame(t) {
           if (!t0) t0 = t;
           prog = Math.min((t - t0) / dur, 1);
-          fill.style.height = `${prog * 100}%`;
+          draw();
           if (prog < 1 && !clicked) {
             animId = requestAnimationFrame(frame);
           } else if (!clicked) {
@@ -86,13 +114,12 @@
         }
         animId = requestAnimationFrame(frame);
 
-        outer.addEventListener('click', function onClick() {
+        canvas.onclick = () => {
           if (clicked) return;
           clicked = true;
           cancelAnimationFrame(animId);
-          outer.removeEventListener('click', onClick);
           resolve();
-        });
+        };
 
         function resolve() {
           let pts = 0;
@@ -101,17 +128,13 @@
             const halfW  = (zE - zS) / 2;
             const dist   = Math.abs(prog - center) / halfW;
             pts = Math.round(100 * (1 - dist * 0.6));
-            fb.textContent = `+${pts} pts — zone hit!`;
-            fb.className = 'zapn-feedback zapn-feedback--good';
-          } else if (prog < zS) {
-            fb.textContent = 'Too early — 0 pts';
-            fb.className = 'zapn-feedback zapn-feedback--bad';
+            if (fb) { fb.textContent = `+${pts} pts — zone hit!`; fb.className = 'zapn-feedback zapn-feedback--good'; }
           } else {
-            fb.textContent = 'Too late — 0 pts';
-            fb.className = 'zapn-feedback zapn-feedback--bad';
+            if (fb) { fb.textContent = prog < zS ? 'Too early — 0 pts' : 'Too late — 0 pts'; fb.className = 'zapn-feedback zapn-feedback--bad'; }
           }
           total += pts;
-          if ($('sm-total')) $('sm-total').textContent = total;
+          const totEl = $('sm-total');
+          if (totEl) totEl.textContent = total;
           round++;
           if (round >= ROUNDS) {
             setTimeout(() => done(Math.round(total / ROUNDS), `${total} / ${ROUNDS * 100}`), 1400);
@@ -142,8 +165,6 @@
         const perPump  = high ? 3 : 1;
         const popDenom = high ? 8 : 13;
         const size     = Math.min(44 + pumps * 13, 210);
-        const popPct   = Math.round((pumps / popDenom) * 100);
-
         el.innerHTML = `
           <div class="zapn-bl-wrap">
             <div class="zapn-bl-meta">
@@ -153,7 +174,7 @@
             <div class="zapn-bl-stage">
               <div class="zapn-bl-balloon" style="width:${size}px;height:${size}px"></div>
             </div>
-            <div class="zapn-bl-info">Pumps: ${pumps} · Earned: $${roundEarned} · Burst risk: ~${popPct}%</div>
+            <div class="zapn-bl-info">Pumps: ${pumps} · Earned this round: $${roundEarned}</div>
             <div class="zapn-bl-btns">
               <button class="btn btn-primary" id="bl-pump">Pump (+$${perPump})</button>
               <button class="btn" id="bl-cash">Cash Out ($${roundEarned})</button>
@@ -217,12 +238,13 @@
   GAMES.push({
     name: 'Skyscraper',
     tag: 'Planning',
-    desc: 'Rearrange colored blocks to match the target layout using minimal moves.',
-    hint: 'Click a stack to pick up its top block, then click another stack to place it. Reach the target arrangement shown on the right. 3 puzzles of increasing difficulty.',
+    desc: 'Rearrange colored balls in glass tubes to match the target layout using minimal moves.',
+    hint: 'Click a tube to pick up its top ball, then click another tube to drop it there. Reach the target arrangement shown on the right. 3 puzzles of increasing difficulty.',
     play(el, done) {
       const PUZZLES = 3;
-      const COLORS = ['#E74C3C', '#3498DB', '#2ECC71', '#F1C40F', '#9B59B6'];
-      const NAMES  = ['R', 'B', 'G', 'Y', 'P'];
+      const COLORS = ['#cc2222', '#2255cc', '#22aa22', '#ccaa00', '#8822cc'];
+      const LIGHTS = ['rgba(255,160,160,0.75)', 'rgba(160,160,255,0.75)', 'rgba(160,255,160,0.75)', 'rgba(255,240,140,0.75)', 'rgba(220,150,255,0.75)'];
+      const DARKS  = ['#7a0000', '#001a66', '#004d00', '#554400', '#3d0066'];
 
       let puzzle = 0, totalScore = 0;
       let state, goalState, optDepth, moveCount, selected;
@@ -265,11 +287,11 @@
         renderBoard();
       }
 
+      function ballStyle(b) {
+        return `radial-gradient(ellipse at 36% 28%, ${LIGHTS[b]}, ${COLORS[b]} 48%, ${DARKS[b]})`;
+      }
+
       function renderBoard() {
-        const maxH = Math.max(
-          ...state.map(s => s.length),
-          ...goalState.map(s => s.length), 1
-        );
         const carriedBlock = selected !== null ? state[selected][state[selected].length - 1] : null;
 
         el.innerHTML = `
@@ -278,20 +300,20 @@
 
             <div class="zapn-sky-status${selected !== null ? ' zapn-sky-status--carrying' : ''}">
               ${selected !== null
-                ? `<div class="zapn-sky-block zapn-sky-carried-block" style="background:${COLORS[carriedBlock]}">${NAMES[carriedBlock]}</div>
-                   <span>Carrying — click a stack to place</span>`
-                : `<span>Click a stack to pick up its top block</span>`}
+                ? `<div class="sky-ball sky-ball-sm" style="background:${ballStyle(carriedBlock)}"></div>
+                   <span>Carrying — click a tube to place</span>`
+                : `<span>Click a tube to pick up its top ball</span>`}
             </div>
 
             <div class="zapn-sky-boards">
               <div class="zapn-sky-board">
                 <div class="zapn-sky-label">Current</div>
-                <div class="zapn-sky-stacks" id="sky-cur">${stacksHTML(state, maxH, true)}</div>
+                <div class="zapn-sky-stacks" id="sky-cur">${stacksHTML(state, true)}</div>
               </div>
               <div class="zapn-sky-arrow">→</div>
               <div class="zapn-sky-board">
                 <div class="zapn-sky-label">Target</div>
-                <div class="zapn-sky-stacks">${stacksHTML(goalState, maxH, false)}</div>
+                <div class="zapn-sky-stacks">${stacksHTML(goalState, false)}</div>
               </div>
             </div>
 
@@ -299,9 +321,9 @@
             <button class="btn btn-sm" id="sky-skip" style="margin-top:var(--space-md);opacity:0.5">Skip this puzzle (0 pts)</button>
           </div>`;
 
-        el.querySelectorAll('#sky-cur .zapn-sky-stack').forEach((s, i) => {
+        el.querySelectorAll('#sky-cur .sky-tube-wrap').forEach((s, i) => {
           s.addEventListener('click', () => handleClick(i));
-          if (selected === i) s.classList.add('zapn-sky-selected');
+          if (selected === i) s.classList.add('sky-stack-selected');
         });
 
         $('sky-skip').onclick = () => {
@@ -315,17 +337,18 @@
         };
       }
 
-      function stacksHTML(stacks, maxH, interactive) {
+      function stacksHTML(stacks, interactive) {
         return stacks.map((stack, i) => {
-          const visual    = [...stack].reverse();
-          const empties   = maxH - visual.length;
           const isCarried = interactive && selected === i;
-          return `<div class="zapn-sky-stack${interactive ? ' zapn-sky-stack--interactive' : ''}">
-            ${Array(empties).fill('<div class="zapn-sky-empty-slot"></div>').join('')}
-            ${visual.map((b, vi) =>
-              `<div class="zapn-sky-block${isCarried && vi === 0 ? ' zapn-sky-block--lifted' : ''}" style="background:${COLORS[b]}">${NAMES[b]}</div>`
-            ).join('')}
-            <div class="zapn-sky-base"></div>
+          const topIdx    = stack.length - 1;
+          return `<div class="sky-tube-wrap${interactive ? ' sky-tube-interactive' : ''}">
+            <div class="sky-tube-body">
+              ${stack.map((b, bi) =>
+                `<div class="sky-ball${isCarried && bi === topIdx ? ' sky-ball-lifted' : ''}"
+                   style="background:${ballStyle(b)}"></div>`
+              ).join('')}
+            </div>
+            <div class="sky-tube-base"></div>
           </div>`;
         }).join('');
       }

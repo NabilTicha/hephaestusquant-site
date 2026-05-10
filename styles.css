@@ -1493,7 +1493,7 @@ code {
 }
 
 /* ================================================
-   Game 3 — Skyscraper
+   Game 3 — Skyscraper (glass tubes + 3-D balls)
    ================================================ */
 .zapn-sky-wrap { text-align: center; }
 
@@ -1530,100 +1530,125 @@ code {
 .zapn-sky-arrow {
   font-size: 1.6rem;
   color: var(--muted);
-  padding-top: 3.5rem;
+  padding-top: 5rem;
 }
 
 .zapn-sky-stacks {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   align-items: flex-end;
 }
 
-.zapn-sky-stack {
+/* ---- tube wrapper ---- */
+.sky-tube-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 54px;
-  min-height: 170px;
-  gap: 3px;
-  padding-top: 4px;
   cursor: default;
-  border-radius: 2px;
 }
 
-.zapn-sky-stack--interactive { cursor: pointer; }
+.sky-tube-interactive { cursor: pointer; }
 
-.zapn-sky-stack--interactive:hover {
-  outline: 1px dashed var(--border-strong);
-  outline-offset: 3px;
+/* ---- glass tube body ---- */
+.sky-tube-body {
+  position: relative;
+  width: 84px;
+  height: 300px;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-bottom: none;
+  border-radius: 42px 42px 0 0;
+  background:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,0.07) 0%,
+      rgba(255,255,255,0.02) 28%,
+      rgba(255,255,255,0.01) 72%,
+      rgba(255,255,255,0.05) 100%
+    );
+  display: flex;
+  flex-direction: column-reverse; /* first child = bottom of tube */
+  align-items: center;
+  padding: 10px 8px 8px;
+  gap: 3px;
+  overflow: hidden;
 }
 
-.zapn-sky-selected {
-  outline: 2px solid var(--accent) !important;
-  outline-offset: 3px;
+/* left-edge highlight for glass look */
+.sky-tube-body::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 28px;
+  bottom: 0;
+  width: 5px;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 3px 3px 0 0;
+  pointer-events: none;
 }
 
-.zapn-sky-block {
-  width: 48px;
-  height: 30px;
-  border-radius: 3px;
+.sky-tube-interactive:hover .sky-tube-body {
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+/* selected tube — gold outline */
+.sky-stack-selected .sky-tube-body {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 18px rgba(184, 156, 75, 0.35);
+}
+
+/* ---- white base plate ---- */
+.sky-tube-base {
+  width: 92px;
+  height: 15px;
+  background: linear-gradient(to bottom, #e8e8e8, #b8b8b8);
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- 3-D ball ---- */
+.sky-ball {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.55),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* small ball used in the carrying indicator */
+.sky-ball-sm {
+  width: 28px;
+  height: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+/* top ball of selected tube dims to show it's in-flight */
+.sky-ball-lifted {
+  opacity: 0.28;
+  transform: scale(0.88);
+  box-shadow: none;
+}
+
+/* carrying-state status bar */
+.zapn-sky-status {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-sm);
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
-  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-height: 2.4rem;
+  margin-bottom: var(--space-sm);
 }
 
-.zapn-sky-empty-slot {
-  width: 48px;
-  height: 30px;
-  flex-shrink: 0;
-}
-
-.zapn-sky-base {
-  width: 54px;
-  height: 3px;
-  background: var(--border-strong);
-  border-radius: 2px;
-  margin-top: 2px;
-}
+.zapn-sky-status--carrying { color: var(--accent); }
 
 .zapn-sky-hint {
   font-size: 0.78rem;
   color: var(--text-secondary);
   margin-bottom: var(--space-sm);
-}
-
-/* carrying-state indicator shown above the boards */
-.zapn-sky-status {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  min-height: 2.2rem;
-  margin-bottom: var(--space-sm);
-}
-
-.zapn-sky-status--carrying {
-  color: var(--accent);
-}
-
-/* small copy of the block shown in the carrying indicator */
-.zapn-sky-carried-block {
-  transform: scale(1.15);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-}
-
-/* top block of the selected stack — visually lifted */
-.zapn-sky-block--lifted {
-  opacity: 0.35;
-  outline: 2px dashed rgba(255, 255, 255, 0.45);
-  outline-offset: -2px;
 }
 
 /* ================================================
@@ -2066,7 +2091,12 @@ code {
   .zapn-sky-arrow {
     transform: rotate(90deg);
     padding: 0;
+    padding-top: 0 !important;
   }
+
+  .sky-tube-body { height: 240px; }
+  .sky-ball { width: 48px; height: 48px; }
+  .sky-tube-wrap { transform: scale(0.85); transform-origin: top center; }
 
   .zapn-sf-arena {
     gap: var(--space-lg);
