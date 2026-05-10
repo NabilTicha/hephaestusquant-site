@@ -16,9 +16,10 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
       RANK()        OVER (ORDER BY ds.score DESC, ds.created_at ASC) AS rank
     FROM drill_scores ds
     JOIN users u ON u.id = ds.user_id
-    WHERE ds.id = (
+    WHERE ds.game_type = '80in8'
+      AND ds.id = (
       SELECT id FROM drill_scores
-      WHERE user_id = ds.user_id
+      WHERE user_id = ds.user_id AND game_type = '80in8'
       ORDER BY score DESC, created_at ASC
       LIMIT 1
     )

@@ -103,6 +103,7 @@
   </footer>
 
   <script src="/js/auth.js"></script>
+  <script>Auth.onReady(user => { if (!user) Auth.login(); });</script>
 
 </body>
 </html>

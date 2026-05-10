@@ -20,7 +20,8 @@ CREATE TABLE drill_scores (
   correct     INTEGER NOT NULL,
   wrong       INTEGER NOT NULL,
   skipped     INTEGER NOT NULL,
-  duration_s  INTEGER NOT NULL,   -- seconds taken (max 480)
+  duration_s  INTEGER NOT NULL,
+  game_type   TEXT NOT NULL DEFAULT '80in8',  -- '80in8' | 'zapn' | 'math'
   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
 

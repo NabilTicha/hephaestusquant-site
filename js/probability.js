@@ -493,6 +493,7 @@
 
     container.querySelectorAll('[data-practice]').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
         const q = QUESTIONS.find(q => q.id === +btn.dataset.practice);
         if (q) startPractice(q);
       });
@@ -637,6 +638,19 @@
 
     $('pr-restart').onclick   = startTest;
     $('pr-back-list').onclick = () => showSection('prob-list');
+
+    // Submit normalized score (correct/total * 100) to the leaderboard
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+      const normScore = Math.round(correct / total * 100);
+      fetch('/api/drill/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: normScore, correct, wrong: total - correct,
+          skipped: 0, duration_s: 0, game_type: 'math',
+        }),
+      });
+    }
   }
 
   // ================================================================
@@ -649,7 +663,15 @@
     const startBtn = $('prob-start-all');
     if (startBtn) {
       startBtn.textContent = `Start Full Test — ${QUESTIONS.length} questions`;
-      startBtn.onclick = startTest;
+      if (typeof Auth !== 'undefined') {
+        Auth.onReady(user => {
+          if (!user) startBtn.textContent = 'Sign in to start Math Tests';
+        });
+      }
+      startBtn.onclick = () => {
+        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
+        startTest();
+      };
     }
 
     const backBtn = $('pq-back-btn');

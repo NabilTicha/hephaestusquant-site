@@ -1133,6 +1133,23 @@
     $('zapn-next-btn').onclick = isLast ? showResults : () => beginGame(idx + 1);
   }
 
+  // Normalize each game's raw score to the 0-100 scale.
+  function zapnNorm(idx, raw) {
+    if (raw == null) return 0;
+    const v = [
+      raw,                                                         // 0 Stock Master   0-100
+      Math.min(100, Math.round(raw / 25 * 100)),                  // 1 Balloon         $0-$25 → 0-100
+      raw,                                                         // 2 Skyscraper      0-100
+      raw,                                                         // 3 Shapeshift      0-100
+      Math.min(100, Math.round(Math.max(0, raw - 6) / 12 * 100)), // 4 Digit           span 6-18 → 0-100
+      raw,                                                         // 5 Switch          0-100
+      raw,                                                         // 6 Number Box      0-100
+      raw,                                                         // 7 Code Compare    0-100
+      Math.round(Math.max(0, raw - 20) / 80 * 100),               // 8 Figure It Out   20-100 → 0-100
+    ];
+    return Math.max(0, Math.min(100, v[idx] ?? raw));
+  }
+
   function showResults() {
     showSection('zapn-results');
     $('zapn-progress-fill').style.width = '100%';
@@ -1148,6 +1165,22 @@
     }).join('');
 
     $('zapn-restart-btn').onclick = startTest;
+
+    // Submit normalized overall score to the leaderboard
+    if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+      const filled = scores.filter(s => s !== null);
+      if (filled.length > 0) {
+        const overall = Math.round(
+          scores.reduce((sum, s, i) => sum + (s ? zapnNorm(i, s.score) : 0), 0) /
+          filled.length
+        );
+        fetch('/api/drill/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score: overall, correct: 0, wrong: 0, skipped: 0, duration_s: 0, game_type: 'zapn' }),
+        });
+      }
+    }
   }
 
   // ==============================================================
@@ -1156,7 +1189,17 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const startBtn = $('zapn-start-btn');
-    if (startBtn) startBtn.onclick = startTest;
+    if (startBtn) {
+      if (typeof Auth !== 'undefined') {
+        Auth.onReady(user => {
+          if (!user) startBtn.textContent = 'Sign in to start Zap-N';
+        });
+      }
+      startBtn.onclick = () => {
+        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
+        startTest();
+      };
+    }
     showSection('zapn-intro');
   });
 })();
