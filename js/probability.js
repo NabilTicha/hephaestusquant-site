@@ -493,7 +493,6 @@
 
     container.querySelectorAll('[data-practice]').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
         const q = QUESTIONS.find(q => q.id === +btn.dataset.practice);
         if (q) startPractice(q);
       });
@@ -663,15 +662,7 @@
     const startBtn = $('prob-start-all');
     if (startBtn) {
       startBtn.textContent = `Start Full Test — ${QUESTIONS.length} questions`;
-      if (typeof Auth !== 'undefined') {
-        Auth.onReady(user => {
-          if (!user) startBtn.textContent = 'Sign in to start Math Tests';
-        });
-      }
-      startBtn.onclick = () => {
-        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
-        startTest();
-      };
+      startBtn.onclick = startTest;
     }
 
     const backBtn = $('pq-back-btn');

@@ -351,15 +351,6 @@
     return pool;
   }
 
-  // ---- Auth gate ----
-  function withAuth(fn) {
-    if (typeof Auth === 'undefined') { fn(); return; }
-    Auth.onReady(user => {
-      if (!user) { Auth.login(); return; }
-      fn();
-    });
-  }
-
   // ---- Test flow ----
   function startTest() {
     questions = generateQuestionPool(TOTAL_QUESTIONS);
@@ -583,18 +574,8 @@
   // ---- Wire up ----
   document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('start-btn');
-
-    // Set correct button state once auth is ready
-    if (typeof Auth !== 'undefined') {
-      Auth.onReady(user => {
-        if (!user && startBtn) {
-          startBtn.textContent = 'Sign in to take the drill';
-        }
-      });
-    }
-
     if (startBtn) {
-      startBtn.addEventListener('click', () => withAuth(startTest));
+      startBtn.addEventListener('click', startTest);
     }
 
     document.getElementById('skip-btn').addEventListener('click', skip);

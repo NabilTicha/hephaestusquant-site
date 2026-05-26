@@ -1190,15 +1190,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const startBtn = $('zapn-start-btn');
     if (startBtn) {
-      if (typeof Auth !== 'undefined') {
-        Auth.onReady(user => {
-          if (!user) startBtn.textContent = 'Sign in to start Zap-N';
-        });
-      }
-      startBtn.onclick = () => {
-        if (typeof Auth !== 'undefined' && !Auth.requireAuth()) return;
-        startTest();
-      };
+      startBtn.onclick = startTest;
     }
     showSection('zapn-intro');
   });
