@@ -50,7 +50,7 @@ const Auth = (() => {
       `;
     } else {
       container.innerHTML = `
-        <button class="btn btn-primary btn-sm" onclick="Auth.login()">Sign in with Google</button>
+        <button class="btn btn-primary btn-sm" onclick="Auth.login()">Sign in with TU Delft</button>
       `;
     }
   }

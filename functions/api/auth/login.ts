@@ -8,7 +8,7 @@ function base64url(buf: ArrayBuffer | Uint8Array): string {
 }
 
 // Stateless, HMAC-signed OAuth state parameter. Format: nonce.ts.sig (all base64url).
-// Avoids relying on a Set-Cookie surviving the Google redirect round trip.
+// Avoids relying on a Set-Cookie surviving the OAuth redirect round trip.
 async function signState(secret: string): Promise<string> {
   const nonceBytes = crypto.getRandomValues(new Uint8Array(16));
   const nonce = base64url(nonceBytes);
@@ -23,20 +23,25 @@ async function signState(secret: string): Promise<string> {
 
 export const onRequestGet: CFPagesFunction = async ({ env }) => {
   const state = await signState(env.JWT_SECRET);
+  // Tenant-scoped authorize URL: hitting TU Delft's tenant id sends users
+  // straight to the TU Delft NetID login screen. If MS_TENANT_ID is missing
+  // we fall back to `organizations` (any work/school account) and rely on
+  // the email-domain check in the callback.
+  const tenant = env.MS_TENANT_ID || 'organizations';
   const params = new URLSearchParams({
-    client_id: env.GOOGLE_CLIENT_ID,
-    redirect_uri: env.GOOGLE_REDIRECT_URI,
+    client_id: env.MS_CLIENT_ID,
+    redirect_uri: env.MS_REDIRECT_URI,
     response_type: 'code',
-    scope: 'openid email profile',
+    response_mode: 'query',
+    scope: 'openid email profile User.Read',
     state,
-    access_type: 'online',
     prompt: 'select_account',
   });
 
   return new Response(null, {
     status: 302,
     headers: {
-      Location: `https://accounts.google.com/o/oauth2/v2/auth?${params}`,
+      Location: `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?${params}`,
     },
   });
 };

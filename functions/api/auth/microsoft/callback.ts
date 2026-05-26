@@ -3,6 +3,10 @@ import { signJWT } from '../../../../shared/jwt';
 const encoder = new TextEncoder();
 const STATE_TTL_SECONDS = 10 * 60;
 
+// Defense in depth: even if MS_TENANT_ID is misconfigured (e.g., 'common'),
+// only TU Delft addresses can complete the flow.
+const ALLOWED_DOMAINS = ['tudelft.nl', 'student.tudelft.nl'];
+
 function base64urlDecode(s: string): Uint8Array {
   s = s.replace(/-/g, '+').replace(/_/g, '/');
   while (s.length % 4) s += '=';
@@ -27,6 +31,11 @@ async function verifyState(state: string, secret: string): Promise<boolean> {
   return crypto.subtle.verify('HMAC', key, sig.buffer as ArrayBuffer, encoder.encode(`${nonce}.${ts}`));
 }
 
+function emailDomain(email: string): string {
+  const at = email.lastIndexOf('@');
+  return at < 0 ? '' : email.slice(at + 1).toLowerCase();
+}
+
 export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
@@ -41,15 +50,17 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
     return new Response('Invalid or expired state', { status: 403 });
   }
 
-  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+  const tenant = env.MS_TENANT_ID || 'organizations';
+  const tokenRes = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       code,
-      client_id: env.GOOGLE_CLIENT_ID,
-      client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: env.GOOGLE_REDIRECT_URI,
+      client_id: env.MS_CLIENT_ID,
+      client_secret: env.MS_CLIENT_SECRET,
+      redirect_uri: env.MS_REDIRECT_URI,
       grant_type: 'authorization_code',
+      scope: 'openid email profile User.Read',
     }),
   });
 
@@ -59,7 +70,7 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
 
   const tokens = await tokenRes.json() as { access_token: string };
 
-  const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+  const userInfoRes = await fetch('https://graph.microsoft.com/v1.0/me', {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   });
 
@@ -68,23 +79,35 @@ export const onRequestGet: CFPagesFunction = async ({ request, env }) => {
   }
 
   const userInfo = await userInfoRes.json() as {
-    id: string; email: string; name: string; picture: string;
+    id: string;
+    displayName: string;
+    mail: string | null;
+    userPrincipalName: string;
   };
+
+  // Microsoft Graph: mail is the verified address; UPN is the login name and is
+  // usually an email-shaped string too. Prefer mail, fall back to UPN.
+  const email = (userInfo.mail || userInfo.userPrincipalName || '').toLowerCase();
+  if (!email || !ALLOWED_DOMAINS.includes(emailDomain(email))) {
+    return new Response('TU Delft account required (@tudelft.nl or @student.tudelft.nl).', { status: 403 });
+  }
 
   const userId = crypto.randomUUID();
 
+  // ON CONFLICT(email): a user who already exists (perhaps from the previous
+  // Google flow) gets matched by email and their microsoft_id is filled in.
   await env.FORECAST_DB.prepare(`
-    INSERT INTO users (id, google_id, email, name, picture_url, last_login)
+    INSERT INTO users (id, microsoft_id, email, name, picture_url, last_login)
     VALUES (?1, ?2, ?3, ?4, ?5, datetime('now'))
-    ON CONFLICT(google_id) DO UPDATE SET
+    ON CONFLICT(email) DO UPDATE SET
+      microsoft_id = excluded.microsoft_id,
       name = excluded.name,
-      picture_url = excluded.picture_url,
       last_login = datetime('now')
-  `).bind(userId, userInfo.id, userInfo.email, userInfo.name, userInfo.picture).run();
+  `).bind(userId, userInfo.id, email, userInfo.displayName || email, null).run();
 
   const dbUser = await env.FORECAST_DB.prepare(
-    'SELECT id, email, name, picture_url FROM users WHERE google_id = ?1'
-  ).bind(userInfo.id).first<{ id: string; email: string; name: string; picture_url: string }>();
+    'SELECT id, email, name, picture_url FROM users WHERE email = ?1'
+  ).bind(email).first<{ id: string; email: string; name: string; picture_url: string | null }>();
 
   if (!dbUser) {
     return new Response('Failed to create user', { status: 500 });

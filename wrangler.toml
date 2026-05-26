@@ -8,10 +8,14 @@ database_name = "hephaestus-forecast"
 database_id = "8b20c7bb-4c7f-4f7f-9a87-afbbf18624be"
 
 [vars]
-GOOGLE_CLIENT_ID = "480867618969-594njhrle4smdl0qbbulqc0kb6mk71s0.apps.googleusercontent.com"
-GOOGLE_REDIRECT_URI = "https://hephaestusquant.org/api/auth/google/callback"
+# Register the app at https://entra.microsoft.com → App registrations.
+# Account types: "Accounts in this organizational directory only (TU Delft)".
+# Redirect URI: https://hephaestusquant.org/api/auth/microsoft/callback
+MS_CLIENT_ID = ""           # Application (client) ID from Entra
+MS_TENANT_ID = ""           # Directory (tenant) ID — TU Delft's tenant
+MS_REDIRECT_URI = "https://hephaestusquant.org/api/auth/microsoft/callback"
 SITE_URL = "https://hephaestusquant.org"
 
-# GOOGLE_CLIENT_SECRET and JWT_SECRET should be set as encrypted secrets:
-# wrangler pages secret put GOOGLE_CLIENT_SECRET
+# MS_CLIENT_SECRET and JWT_SECRET must be set as encrypted secrets:
+# wrangler pages secret put MS_CLIENT_SECRET
 # wrangler pages secret put JWT_SECRET

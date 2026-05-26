@@ -11,7 +11,7 @@
           <div class="cta-block">
             <h2>Sign in to view your profile</h2>
             <p>Or visit a profile via the leaderboard.</p>
-            <button class="btn btn-primary" onclick="Auth.login()">Sign in with Google</button>
+            <button class="btn btn-primary" onclick="Auth.login()">Sign in with TU Delft</button>
           </div>
         `;
       }
